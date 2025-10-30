@@ -1,0 +1,65 @@
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+.pytest_cache/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Replit
+ReplitCore/
+.replit
+replit.nix
+
+# Build artifacts
+*.zip
+*.tar.gz
+
+# Workspace (will be mounted)
+workspace/
+backend/workspace/
+
+# Secrets
+.env
+.env.local
+google_credentials.json
+*.key
+*.pem
+
+# Scripts
+verify-setup.sh
+cleanup-replit.sh
+start-dev.sh
+
+# Other
+seti.woff
+
