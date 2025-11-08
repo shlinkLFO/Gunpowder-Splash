@@ -6,19 +6,17 @@ function System() {
     node: 'Node.js 20',
     backend: 'FastAPI + Uvicorn',
     frontend: 'React 18 + Vite',
-    database: 'In-Memory (Pandas)',
-    websocket: 'Running on port 8001',
+    database: 'PostgreSQL 15',
   }
 
   const packages = {
     backend: [
       'fastapi',
       'uvicorn',
-      'pandas',
-      'numpy',
-      'plotly',
-      'websockets',
-      'python-socketio',
+      'sqlalchemy',
+      'psycopg2',
+      'stripe',
+      'google-cloud-storage',
       'aiofiles',
       'python-multipart'
     ],
@@ -29,7 +27,6 @@ function System() {
       'typescript',
       '@chakra-ui/react',
       '@monaco-editor/react',
-      'socket.io-client',
       '@tanstack/react-query',
       'axios',
       'zustand'
@@ -153,14 +150,6 @@ function System() {
               </Text>
               <Text fontSize="sm" color="green.400" fontWeight="bold">
                 ✓ Running (Port 5000)
-              </Text>
-            </HStack>
-            <HStack>
-              <Text fontSize="sm" color="midnight.500" w="200px">
-                WebSocket Server:
-              </Text>
-              <Text fontSize="sm" color="green.400" fontWeight="bold">
-                ✓ Running (Port 8001)
               </Text>
             </HStack>
           </VStack>

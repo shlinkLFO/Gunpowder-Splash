@@ -14,7 +14,7 @@ help:
 
 install:
 	@echo "Installing backend dependencies..."
-	cd backend && python -m venv venv && . venv/bin/activate && pip install -r requirements.txt
+	cd backend && python -m venv venv && . venv/bin/activate && pip install -r requirements_beacon.txt
 	@echo "Installing frontend dependencies..."
 	cd frontend && npm install
 	@echo "Installation complete!"

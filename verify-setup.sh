@@ -112,10 +112,9 @@ echo ""
 
 # Check configuration files
 echo "Checking configuration files..."
-check_file "backend/requirements.txt"
+check_file "backend/requirements_beacon.txt"
 check_file "frontend/package.json"
 check_file "frontend/vite.config.ts"
-check_file "websocket_server.py"
 check_file "start-dev.sh"
 check_file "docker-compose.yml"
 echo ""
@@ -128,7 +127,7 @@ if [ -d "backend/venv" ]; then
     echo -e "${GREEN}✓${NC} Python virtual environment exists"
 else
     echo -e "${YELLOW}!${NC} Python virtual environment not found"
-    echo "  Run: cd backend && python -m venv venv && source venv/bin/activate && pip install -r requirements.txt"
+    echo "  Run: cd backend && python -m venv venv && source venv/bin/activate && pip install -r requirements_beacon.txt"
     ((WARNINGS++))
 fi
 
@@ -157,7 +156,6 @@ check_port() {
 }
 
 check_port 8000  # Backend
-check_port 8001  # WebSocket
 check_port 5173  # Frontend
 echo ""
 

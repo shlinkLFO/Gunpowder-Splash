@@ -1,197 +1,335 @@
-# Gunpowder Splash - Cloud IDE Platform
+# Beacon Studio
 
-A modern, collaborative cloud IDE for data analysis and code execution. Built by Glowstone (glowstone.red).
+**Multi-tenant, browser-based IDE platform built on Code OSS**
 
-## Features
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GCP](https://img.shields.io/badge/Cloud-GCP-4285F4?logo=google-cloud)](https://cloud.google.com)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-00a393.svg)](https://fastapi.tiangolo.com)
 
-- Real-time collaborative code editing with WebSocket synchronization
-- Multi-file tabbed code editor with syntax highlighting (Monaco Editor)
-- Jupyter notebook integration with inline cell execution
-- Interactive data exploration and visualization (Plotly)
-- Rainbow CSV viewer with inline editing
-- Web-Edit mode (HTML/CSS/JS live preview)
-- Code history tracking
-- Template library for quick starts
-- Multi-sheet Excel file support
+> **Codename**: Gunpowder Splash  
+> **Production URL**: `https://glowstone.red/beacon-studio`
 
-## Architecture
+---
 
-### Backend
-- **FastAPI** - High-performance async API
-- **Python 3.11+** - Core runtime
-- **Pandas** - Data processing
-- **WebSocket** - Real-time collaboration
+## Overview
 
-### Frontend
-- **React 18** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Build tool
-- **Chakra UI** - Component library
-- **Monaco Editor** - Code editor
+Beacon Studio is a production-ready, cloud-hosted IDE platform that transforms Code OSS (open-source VS Code) into a multi-tenant SaaS application with:
+
+- **Browser-based editor** - No installation required
+- **Team collaboration** - Shared workspaces with role-based access
+- **Cloud storage** - Up to 240 GB with automatic backup
+- **AI integration** - Gemini, LM Studio, and Ollama support
+- **Subscription billing** - Stripe-powered pricing tiers
+- **OAuth authentication** - Google and GitHub sign-in
+
+---
 
 ## Quick Start
 
-### Prerequisites
-- Python 3.11+
-- Node.js 20+
-- npm or yarn
+### For Developers
 
-### Installation
+Get the backend running locally in 30 minutes:
 
-1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd "Gunpowder Splash"
-```
+# Set up database
+createdb beacon_studio
+psql beacon_studio < backend/schema.sql
 
-2. Set up the backend:
-```bash
+# Set up backend
 cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cd ..
+python3.11 -m venv venv
+source venv/bin/activate
+pip install -r requirements_beacon.txt
+cp .env.example .env  # Edit with your values
+python -m app.main_beacon
 ```
 
-3. Set up the frontend:
+**Backend runs at**: http://localhost:8000  
+**API docs at**: http://localhost:8000/api/v1/docs
+
+📖 **Full guide**: [docs/QUICK_START_BEACON.md](docs/QUICK_START_BEACON.md)
+
+### For DevOps
+
+Deploy to GCP with Terraform:
+
 ```bash
-cd frontend
-npm install
-cd ..
+cd terraform
+terraform init
+terraform apply -var="project_id=beacon-studio-prod"
 ```
 
-### Running the Application
+📖 **Full guide**: [docs/SETUP_GUIDE_BEACON.md](docs/SETUP_GUIDE_BEACON.md)
 
-#### Development Mode
+---
 
-Run all services with the startup script:
-```bash
-chmod +x start-dev.sh
-./start-dev.sh
-```
+## Features
 
-Or manually start each service:
+### Subscription Plans
 
-1. Start the WebSocket server (Terminal 1):
-```bash
-python websocket_server.py
-```
+| Plan | Price | Storage | Team Size | Best For |
+|------|-------|---------|-----------|----------|
+| **Free** | $0/mo | 0.84 GB | 1 user | Personal projects |
+| **Haste I** | $16.99/mo | 20 GB | 5 users | Small teams |
+| **Haste II** | $29.99/mo | 60 GB | 9 users | Growing teams |
+| **Haste III** | $49.99/mo | 240 GB | 17 users | Large teams |
 
-2. Start the backend API (Terminal 2):
-```bash
-cd backend
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-```
+### Core Features
 
-3. Start the frontend (Terminal 3):
-```bash
-cd frontend
-npm run dev
-```
+- **Code OSS Editor** - Full-featured IDE in your browser
+- **Project Management** - Multiple projects per workspace
+- **File Storage** - Cloud Storage with quota management
+- **Team Collaboration** - ADMIN, MOD, and USER roles
+- **AI Assistant** - Integrated code help and generation
+- **Version Control** - Built-in Git support (via Code OSS)
+- **Extensions** - Custom extension marketplace
 
-#### Access the Application
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:8000
-- WebSocket: ws://localhost:8001
-- API Docs: http://localhost:8000/docs
+---
 
-### Using Docker
+## Architecture
 
-Build and run with Docker Compose:
-```bash
-docker-compose up --build
-```
+### Technology Stack
 
-## Project Structure
+**Backend**
+- Python 3.11+ with FastAPI
+- PostgreSQL 15 (Cloud SQL)
+- Google Cloud Storage
+- Google Cloud Run (serverless)
 
-```
-Gunpowder Splash/
-├── backend/              # FastAPI backend
-│   ├── app/
-│   │   ├── main.py      # Application entry point
-│   │   ├── routers/     # API endpoints
-│   │   └── services/    # Business logic
-│   ├── requirements.txt
-│   └── workspace/       # User file workspace
-├── frontend/            # React frontend
-│   ├── src/
-│   │   ├── components/  # React components
-│   │   ├── hooks/       # Custom hooks
-│   │   └── styles/      # Theme and styles
-│   ├── package.json
-│   └── vite.config.ts
-├── websocket_server.py  # Collaboration server
-├── docker-compose.yml   # Docker orchestration
-└── README.md
-```
+**Frontend**
+- Code OSS (MIT-licensed VS Code)
+- TypeScript + React
+- Custom file system provider
+
+**Infrastructure**
+- Google Cloud Platform
+- Terraform for IaC
+- Cloud Scheduler for cron jobs
+
+### API Endpoints
+
+- `/api/v1/auth/*` - OAuth authentication
+- `/api/v1/workspaces/*` - Workspace management
+- `/api/v1/projects/*` - Project and file operations
+- `/api/v1/billing/*` - Stripe integration
+- `/api/v1/ai/*` - AI provider integration
+
+📖 **Full API docs**: Available at `/api/v1/docs` when running
+
+---
+
+## Documentation
+
+### Essential Guides
+
+| Document | Description |
+|----------|-------------|
+| [WORK_COMPLETED](docs/WORK_COMPLETED.md) | Complete summary of implementation work |
+| [IMPLEMENTATION_SUMMARY](docs/IMPLEMENTATION_SUMMARY.md) | What's done, what's next |
+| [QUICK_START_BEACON](docs/QUICK_START_BEACON.md) | Get running in 30 minutes |
+| [SETUP_GUIDE_BEACON](docs/SETUP_GUIDE_BEACON.md) | Production deployment guide |
+
+### Technical Documentation
+
+| Document | Description |
+|----------|-------------|
+| [beacon-studio-spec](docs/beacon-studio-spec.md) | Complete product specification |
+| [CODE_OSS_INTEGRATION](docs/CODE_OSS_INTEGRATION.md) | Frontend integration guide |
+| [BEACON_MIGRATION_PLAN](docs/BEACON_MIGRATION_PLAN.md) | 18-phase roadmap |
+| [LICENSES_BEACON](docs/LICENSES_BEACON.md) | Legal compliance & attributions |
+
+### Project Documentation
+
+| Document | Description |
+|----------|-------------|
+| [CONTRIBUTING](docs/CONTRIBUTING.md) | Contribution guidelines |
+| [SECURITY](docs/SECURITY.md) | Security policies |
+| [COLLABORATION](docs/COLLABORATION.md) | Team collaboration guide |
+
+📁 **All documentation**: [docs/](docs/)
+
+---
+
+## Project Status
+
+### ✅ Complete (Backend)
+
+- [x] PostgreSQL database schema with triggers
+- [x] FastAPI backend with all endpoints
+- [x] OAuth authentication (Google, GitHub)
+- [x] Storage management with quota enforcement
+- [x] Stripe billing integration
+- [x] AI provider integration (Gemini, LM Studio, Ollama)
+- [x] GCP infrastructure as code (Terraform)
+- [x] Admin endpoints (reconciliation, purge, stats)
+- [x] Comprehensive documentation
+
+### 🚧 In Progress (Frontend)
+
+- [ ] Build Code OSS from source
+- [ ] Apply Beacon Studio branding
+- [ ] Implement custom file system provider
+- [ ] Create Beacon UI components
+- [ ] Deploy frontend to production
+
+### 📋 Planned
+
+- [ ] End-to-end testing
+- [ ] Security audit
+- [ ] Beta testing
+- [ ] Production launch
+
+📖 **Detailed status**: [docs/IMPLEMENTATION_SUMMARY.md](docs/IMPLEMENTATION_SUMMARY.md)
+
+---
 
 ## Development
 
-### Backend Development
+### Prerequisites
+
+- Python 3.11+
+- PostgreSQL 15+
+- Node.js 18+ (for Code OSS)
+- Docker (optional)
+- Google Cloud SDK (for deployment)
+
+### Project Structure
+
+```
+Beacon Studio/
+├── README.md                   # This file
+├── docs/                       # Documentation
+│   ├── WORK_COMPLETED.md
+│   ├── QUICK_START_BEACON.md
+│   ├── SETUP_GUIDE_BEACON.md
+│   ├── CODE_OSS_INTEGRATION.md
+│   └── ...
+├── backend/                    # Python FastAPI backend
+│   ├── app/
+│   │   ├── main_beacon.py     # Main application
+│   │   ├── models.py          # ORM models
+│   │   ├── auth.py            # Authentication
+│   │   ├── storage.py         # Storage management
+│   │   ├── ai_providers.py    # AI integration
+│   │   └── routers/           # API endpoints
+│   ├── schema.sql             # Database schema
+│   ├── Dockerfile.beacon      # Production Docker
+│   └── requirements_beacon.txt
+├── frontend/                   # Code OSS integration
+│   └── src/
+│       └── beacon-components/ # Custom UI components
+├── terraform/                  # Infrastructure as code
+│   └── beacon-infrastructure.tf
+└── cloudbuild.beacon.yaml     # CI/CD pipeline
+```
+
+### Running Tests
+
 ```bash
+# Backend tests
 cd backend
-python -m uvicorn app.main:app --reload
+pytest tests/
+
+# With coverage
+pytest --cov=app tests/
 ```
 
-### Frontend Development
-```bash
-cd frontend
-npm run dev
-```
-
-### Code Style
-- Backend: Follow PEP 8
-- Frontend: Use ESLint and Prettier
-
-## Configuration
-
-### Backend Environment Variables
-Create a `.env` file in the `backend` directory:
-```
-WORKSPACE_DIR=workspace
-PORT=8000
-```
-
-### Frontend Configuration
-Update `frontend/vite.config.ts` for custom proxy settings.
+---
 
 ## Deployment
 
-### Production Build
+### Development
 
-1. Build the frontend:
 ```bash
-cd frontend
-npm run build
+# Local backend
+python -m app.main_beacon
+
+# Access at http://localhost:8000
 ```
 
-2. Run the backend with production settings:
+### Staging/Production
+
 ```bash
+# Deploy infrastructure
+cd terraform
+terraform apply -var="project_id=beacon-studio-prod"
+
+# Deploy backend
 cd backend
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+gcloud builds submit --config=../cloudbuild.beacon.yaml
 ```
 
-### Docker Deployment
-```bash
-docker-compose -f docker-compose.prod.yml up -d
-```
+📖 **Complete guide**: [docs/SETUP_GUIDE_BEACON.md](docs/SETUP_GUIDE_BEACON.md)
+
+---
 
 ## Security
 
-- Always use HTTPS in production
-- Set proper CORS origins in `backend/app/main.py`
-- Use environment variables for secrets
-- Review `SECURITY.md` for detailed guidelines
+- **Authentication**: OAuth 2.0 only (no passwords)
+- **Authorization**: Role-based access control (RBAC)
+- **Data**: Encrypted in transit and at rest
+- **Secrets**: Google Secret Manager
+- **Compliance**: GDPR/CCPA considerations, audit logging
 
-## Contributing
+📖 **Security policy**: [docs/SECURITY.md](docs/SECURITY.md)
 
-See `COLLABORATION.md` for contribution guidelines.
+---
 
 ## License
 
-Proprietary - Glowstone (glowstone.red)
+- **Beacon Studio Backend**: Proprietary (SaaS product)
+- **Code OSS**: MIT License (see [docs/LICENSES_BEACON.md](docs/LICENSES_BEACON.md))
+- **Third-party dependencies**: See [docs/LICENSES_BEACON.md](docs/LICENSES_BEACON.md)
+
+**Important**: Beacon Studio is based on the MIT-licensed Code OSS project and is NOT affiliated with or endorsed by Microsoft Corporation. We do not use or redistribute the official Visual Studio Code product.
+
+---
+
+## Contributing
+
+We welcome contributions! Please see:
+
+- [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) - Contribution guidelines
+- [docs/COLLABORATION.md](docs/COLLABORATION.md) - Team collaboration
+- [docs/QUICK_START_BEACON.md](docs/QUICK_START_BEACON.md) - Development setup
+
+---
 
 ## Support
 
-For issues and questions, contact the Glowstone team.
+- **Documentation**: [docs/](docs/)
+- **Issues**: Create GitHub issues for bugs
+- **Email**: support@glowstone.red
+- **Website**: https://glowstone.red/beacon-studio
 
+---
+
+## Roadmap
+
+- [x] **Phase 1**: Backend infrastructure (Complete)
+- [ ] **Phase 2**: Code OSS integration (In Progress)
+- [ ] **Phase 3**: Testing & QA
+- [ ] **Phase 4**: Beta launch
+- [ ] **Phase 5**: Production launch
+
+📖 **Detailed roadmap**: [docs/BEACON_MIGRATION_PLAN.md](docs/BEACON_MIGRATION_PLAN.md)
+
+---
+
+## Acknowledgments
+
+Built with open-source software:
+
+- [Code OSS](https://github.com/microsoft/vscode) - MIT License
+- [FastAPI](https://fastapi.tiangolo.com/) - MIT License
+- [SQLAlchemy](https://www.sqlalchemy.org/) - MIT License
+- [Google Cloud Platform](https://cloud.google.com/) - Infrastructure
+
+See [docs/LICENSES_BEACON.md](docs/LICENSES_BEACON.md) for complete attributions.
+
+---
+
+**Beacon Studio** - Illuminate your code, collaborate brilliantly.
+
+*Version 1.0.0 | Last Updated: November 8, 2025*

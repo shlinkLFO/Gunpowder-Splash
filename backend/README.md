@@ -6,25 +6,16 @@ FastAPI-based backend for the Gunpowder Splash collaborative IDE.
 
 ```
 backend/
-├── app/
-│   ├── main.py          # FastAPI application entry
-│   ├── routers/         # API route handlers
-│   │   ├── files.py     # File operations
-│   │   ├── data.py      # Data processing
-│   │   ├── history.py   # Code history
-│   │   ├── notebooks.py # Jupyter notebooks
-│   │   ├── system.py    # System operations
-│   │   └── templates.py # Code templates
-│   └── services/        # Business logic
-│       ├── data_service.py
-│       ├── execution_service.py
-│       ├── file_service.py
-│       ├── history_service.py
-│       ├── notebook_service.py
-│       └── query_service.py
-├── workspace/           # User workspace directory
-├── requirements.txt     # Python dependencies
-└── Dockerfile          # Docker configuration
+├── app/                   # Main FastAPI application
+│   ├── __init__.py
+│   ├── main_beacon.py     # Application entrypoint
+│   ├── routers/           # API endpoint routers
+│   ├── services/          # Business logic
+│   ├── models.py          # SQLAlchemy models
+│   └── ...
+├── requirements_beacon.txt # Python dependencies
+├── schema.sql             # Database schema for reference
+└── ...
 ```
 
 ## Running
@@ -34,7 +25,7 @@ backend/
 cd backend
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements_beacon.txt
 python -m uvicorn app.main:app --reload
 ```
 

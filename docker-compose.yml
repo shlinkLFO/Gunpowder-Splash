@@ -12,18 +12,6 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - WORKSPACE_DIR=/app/workspace
-    depends_on:
-      - websocket
-    restart: unless-stopped
-
-  websocket:
-    build:
-      context: .
-      dockerfile: Dockerfile.websocket
-    ports:
-      - "8001:8001"
-    environment:
-      - PYTHONUNBUFFERED=1
     restart: unless-stopped
 
   frontend:
@@ -34,7 +22,6 @@ services:
       - "80:80"
     depends_on:
       - backend
-      - websocket
     restart: unless-stopped
 
 volumes:

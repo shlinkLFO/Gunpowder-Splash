@@ -35,14 +35,8 @@ cleanup() {
 
 trap cleanup SIGINT SIGTERM
 
-# Start WebSocket Server
-echo -e "${GREEN}[1/3] Starting WebSocket Server (port 8001)...${NC}"
-python3 websocket_server.py &
-WEBSOCKET_PID=$!
-sleep 2
-
 # Start Backend API
-echo -e "${GREEN}[2/3] Starting Backend API (port 8000)...${NC}"
+echo -e "${GREEN}[1/2] Starting Backend API (port 8000)...${NC}"
 cd backend
 python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload &
 BACKEND_PID=$!
@@ -50,7 +44,7 @@ cd ..
 sleep 2
 
 # Start Frontend
-echo -e "${GREEN}[3/3] Starting Frontend (port 5173)...${NC}"
+echo -e "${GREEN}[2/2] Starting Frontend (port 5173)...${NC}"
 cd frontend
 npm run dev &
 FRONTEND_PID=$!
@@ -64,7 +58,6 @@ echo "Access the application at:"
 echo "  Frontend:  http://localhost:5173"
 echo "  Backend:   http://localhost:8000"
 echo "  API Docs:  http://localhost:8000/docs"
-echo "  WebSocket: ws://localhost:8001"
 echo ""
 echo "Press Ctrl+C to stop all services"
 echo "=========================================="
