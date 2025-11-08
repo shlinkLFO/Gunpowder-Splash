@@ -162,7 +162,7 @@ SELECT * FROM df LIMIT 10;`)
             <Button
               size="sm"
               onClick={executeQuery}
-              isLoading={isExecuting}
+              loading={isExecuting}
               colorScheme="green"
             >
               ▶ Execute Query

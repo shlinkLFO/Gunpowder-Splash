@@ -94,7 +94,7 @@ function DataExplorer() {
                 size="sm"
                 as="span"
                 cursor="pointer"
-                isLoading={isLoading}
+                loading={isLoading}
               >
                 📁 Upload Data
               </Button>
