@@ -1,23 +1,98 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:15
+    container_name: beacon-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: beacon_studio
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: beacon-backend
+    command: uvicorn app.main_beacon:app --host 0.0.0.0 --port 8000 --reload
     ports:
       - "8000:8000"
     volumes:
       - ./backend/workspace:/app/workspace
+      - ./backend/app:/app/app
+      - ./google_credentials.json:/app/google_credentials.json:ro
     environment:
+      # Application
       - PYTHONUNBUFFERED=1
-      - WORKSPACE_DIR=/app/workspace
+      - APP_NAME=Beacon Studio
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DEBUG=${DEBUG:-false}
+      - API_PREFIX=/api/v1
+      
+      # Security
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - REFRESH_TOKEN_EXPIRE_DAYS=30
+      
+      # Database
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-changeme}@postgres:5432/beacon_studio
+      
+      # Google Cloud Storage
+      - GCS_BUCKET_NAME=${GCS_BUCKET_NAME}
+      - GCS_PROJECT_ID=${GCS_PROJECT_ID}
+      - GCS_CREDENTIALS_PATH=/app/google_credentials.json
+      
+      # OAuth - Google
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+      
+      # OAuth - GitHub
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - GITHUB_REDIRECT_URI=${GITHUB_REDIRECT_URI}
+      
+      # Stripe
+      - STRIPE_API_KEY=${STRIPE_API_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_PRICE_ID_HASTE_I=${STRIPE_PRICE_ID_HASTE_I}
+      - STRIPE_PRICE_ID_HASTE_II=${STRIPE_PRICE_ID_HASTE_II}
+      - STRIPE_PRICE_ID_HASTE_III=${STRIPE_PRICE_ID_HASTE_III}
+      
+      # AI Providers (optional)
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - LM_STUDIO_ENDPOINT=${LM_STUDIO_ENDPOINT:-}
+      - OLLAMA_ENDPOINT=${OLLAMA_ENDPOINT:-}
+      
+      # CORS
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:80}
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    container_name: beacon-frontend
     ports:
       - "80:80"
     depends_on:
@@ -25,5 +100,6 @@ services:
     restart: unless-stopped
 
 volumes:
+  postgres_data:
   workspace:
 
