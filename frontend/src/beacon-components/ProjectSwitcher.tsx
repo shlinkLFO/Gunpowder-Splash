@@ -265,7 +265,7 @@ export const ProjectSwitcher: React.FC<ProjectSwitcherProps> = ({
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         .beacon-project-button {
           position: fixed;
           top: 10px;
