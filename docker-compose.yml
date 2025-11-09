@@ -76,8 +76,8 @@ services:
       - LM_STUDIO_ENDPOINT=${LM_STUDIO_ENDPOINT:-}
       - OLLAMA_ENDPOINT=${OLLAMA_ENDPOINT:-}
       
-      # CORS
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:80}
+      # CORS (JSON array format for pydantic-settings)
+      - CORS_ORIGINS=${CORS_ORIGINS:-["http://localhost:3000","http://localhost:5173","http://localhost:80","http://glowstone.red"]}
     depends_on:
       postgres:
         condition: service_healthy

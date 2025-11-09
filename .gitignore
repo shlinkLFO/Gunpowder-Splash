@@ -77,4 +77,4 @@ logs/
 # Build artifacts
 uv.lock
 
-ReplitCore/
+env.example
