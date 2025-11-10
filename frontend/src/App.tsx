@@ -7,7 +7,6 @@ import LandingPage from './pages/LandingPage'
 function App() {
   const [selectedFile, setSelectedFile] = useState<string | undefined>()
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
-  const [isGuest, setIsGuest] = useState(false)
 
   useEffect(() => {
     // Check for auth token or guest mode
@@ -16,7 +15,6 @@ function App() {
     
     if (token || guestMode === 'true') {
       setIsAuthenticated(true)
-      setIsGuest(guestMode === 'true')
     } else {
       setIsAuthenticated(false)
     }
@@ -32,7 +30,6 @@ function App() {
       }
       localStorage.removeItem('guest_mode') // Clear guest mode if logging in
       setIsAuthenticated(true)
-      setIsGuest(false)
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname)
     }
@@ -40,7 +37,6 @@ function App() {
 
   const handleContinueAsGuest = () => {
     localStorage.setItem('guest_mode', 'true')
-    setIsGuest(true)
     setIsAuthenticated(true)
   }
 
