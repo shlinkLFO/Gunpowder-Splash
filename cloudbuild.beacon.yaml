@@ -49,7 +49,7 @@ steps:
       - '--timeout'
       - '300'
       - '--set-env-vars'
-      - 'ENVIRONMENT=production'
+      - 'ENVIRONMENT=production,GOOGLE_REDIRECT_URI=https://shlinx.com/api/v1/auth/callback/google,GITHUB_REDIRECT_URI=https://shlinx.com/api/v1/auth/callback/github,GCS_BUCKET_NAME=$_GCS_BUCKET_NAME,GCS_PROJECT_ID=$PROJECT_ID,STRIPE_PRICE_ID_HASTE_I=$_STRIPE_PRICE_ID_HASTE_I,STRIPE_PRICE_ID_HASTE_II=$_STRIPE_PRICE_ID_HASTE_II,STRIPE_PRICE_ID_HASTE_III=$_STRIPE_PRICE_ID_HASTE_III'
       - '--set-secrets'
       - 'SECRET_KEY=beacon-secret-key:latest,DATABASE_URL=beacon-db-url:latest,GOOGLE_CLIENT_ID=beacon-google-client-id:latest,GOOGLE_CLIENT_SECRET=beacon-google-client-secret:latest,GITHUB_CLIENT_ID=beacon-github-client-id:latest,GITHUB_CLIENT_SECRET=beacon-github-client-secret:latest,STRIPE_API_KEY=beacon-stripe-api-key:latest,STRIPE_WEBHOOK_SECRET=beacon-stripe-webhook-secret:latest,GEMINI_API_KEY=beacon-gemini-api-key:latest'
       - '--service-account'
