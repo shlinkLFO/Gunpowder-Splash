@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Box, Button, Text, VStack, HStack } from '@chakra-ui/react'
-import axios from 'axios'
+import axios from '../../lib/axios'
 
 interface DataInfo {
   rows: number

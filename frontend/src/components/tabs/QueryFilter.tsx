@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Box, Button, Text, VStack, HStack, Input } from '@chakra-ui/react'
 import Editor from '@monaco-editor/react'
-import axios from 'axios'
+import axios from '../../lib/axios'
 
 interface QueryResult {
   columns: string[]

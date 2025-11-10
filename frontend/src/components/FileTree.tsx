@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Box, Text, HStack, Button } from '@chakra-ui/react'
-import axios from 'axios'
+import axios from '../lib/axios'
 
 interface FileNode {
   name: string

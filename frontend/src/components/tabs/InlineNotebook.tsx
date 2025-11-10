@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Box, Button, Text, HStack, VStack, Textarea, createToaster } from '@chakra-ui/react'
-import axios from 'axios'
+import axios from '../../lib/axios'
 import ReactMarkdown from 'react-markdown'
 import Editor from '@monaco-editor/react'
 

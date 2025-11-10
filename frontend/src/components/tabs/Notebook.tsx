@@ -1,6 +1,6 @@
 import { Box, Button, VStack, HStack, Text, Code, Spinner, Heading, createToaster } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import axios from '../../lib/axios'
 import Editor from '@monaco-editor/react'
 
 interface NotebookCell {

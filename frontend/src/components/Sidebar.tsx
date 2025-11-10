@@ -1,6 +1,6 @@
 import { Box, VStack, Heading, Text, Button, Input, HStack } from '@chakra-ui/react'
 import { useState } from 'react'
-import axios from 'axios'
+import axios from '../lib/axios'
 import FileTree from './FileTree'
 
 interface SidebarProps {

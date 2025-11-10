@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Box, Button, HStack, Text, VStack, Input } from '@chakra-ui/react'
-import axios from 'axios'
+import axios from '../../lib/axios'
 import * as Papa from 'papaparse'
 
 interface RainbowCSVProps {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Box, Button, Text, HStack, VStack } from '@chakra-ui/react'
 import Editor from '@monaco-editor/react'
-import axios from 'axios'
+import axios from '../../lib/axios'
 import InlineNotebook from './InlineNotebook'
 import RainbowCSV from './RainbowCSV'
 

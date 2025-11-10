@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Box, VStack, Text, HStack, Button } from '@chakra-ui/react'
-import axios from 'axios'
+import axios from '../../lib/axios'
 
 interface HistoryEntry {
   id: string
