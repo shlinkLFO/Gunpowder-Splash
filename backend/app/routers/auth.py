@@ -141,16 +141,19 @@ async def oauth_callback(
     jwt_access_token = create_access_token(data={"sub": str(user.id)})
     jwt_refresh_token = create_refresh_token(user_id=str(user.id))
     
-    return TokenResponse(
-        access_token=jwt_access_token,
-        refresh_token=jwt_refresh_token,
-        user={
-            "id": str(user.id),
-            "email": user.primary_email,
-            "display_name": user.display_name,
-            "avatar_url": user.avatar_url,
-            "provider": user.provider
-        }
+    # Redirect to frontend with token
+    from ..config import get_settings
+    settings = get_settings()
+    
+    # Determine frontend URL based on environment
+    if settings.environment == "production":
+        frontend_url = "https://shlinx.com"
+    else:
+        frontend_url = "http://localhost:5173"
+    
+    # Redirect with token in URL parameter (frontend will extract and store it)
+    return RedirectResponse(
+        url=f"{frontend_url}?token={jwt_access_token}&refresh_token={jwt_refresh_token}"
     )
 
 

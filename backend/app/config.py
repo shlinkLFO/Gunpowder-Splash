@@ -54,7 +54,12 @@ class Settings(BaseSettings):
     ollama_endpoint: str | None = None
     
     # CORS
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://shlinx.com",
+        "http://shlinx.com"
+    ]
     
     # Admin
     admin_secret_key: str | None = None
