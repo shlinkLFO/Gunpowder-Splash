@@ -12,6 +12,7 @@ import logging
 from .config import get_settings
 from .database import engine, Base, get_db
 from .routers import auth, workspaces, projects, billing, ai
+from .auth import verify_admin_secret
 
 settings = get_settings()
 
@@ -111,10 +112,11 @@ async def health_check(db: Session = Depends(get_db)):
         )
 
 
-# Admin endpoints (protected by Cloud Scheduler service account)
+# Admin endpoints (protected by admin secret)
 @app.post("/admin/storage-reconciliation")
 async def storage_reconciliation_job(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: None = Depends(verify_admin_secret)
 ):
     """
     Admin endpoint: Reconcile storage usage for all workspaces
@@ -166,7 +168,8 @@ async def storage_reconciliation_job(
 
 @app.post("/admin/purge-deleted-workspaces")
 async def purge_deleted_workspaces_job(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: None = Depends(verify_admin_secret)
 ):
     """
     Admin endpoint: Purge workspaces past their deletion date
@@ -223,7 +226,8 @@ async def purge_deleted_workspaces_job(
 
 @app.post("/admin/cleanup-expired-oauth-states")
 async def cleanup_expired_oauth_states_job(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: None = Depends(verify_admin_secret)
 ):
     """
     Admin endpoint: Clean up expired OAuth state tokens
@@ -267,7 +271,10 @@ async def cleanup_expired_oauth_states_job(
 
 
 @app.get("/admin/stats")
-async def get_admin_stats(db: Session = Depends(get_db)):
+async def get_admin_stats(
+    db: Session = Depends(get_db),
+    _: None = Depends(verify_admin_secret)
+):
     """
     Admin endpoint: Get system statistics
     

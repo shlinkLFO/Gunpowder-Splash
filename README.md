@@ -27,40 +27,18 @@ Beacon Studio is a production-ready, cloud-hosted IDE platform that transforms C
 
 ## Quick Start
 
-### For Developers
-
-Get the backend running locally in 30 minutes:
-
 ```bash
-# Set up database
-createdb beacon_studio
-psql beacon_studio < backend/schema.sql
+# Clone and start with Docker Compose
+docker-compose up -d
 
-# Set up backend
-cd backend
-python3.11 -m venv venv
-source venv/bin/activate
-pip install -r requirements_beacon.txt
-cp .env.example .env  # Edit with your values
-python -m app.main_beacon
+# Access
+# Frontend: http://localhost:80
+# Backend: http://localhost:8000
+# API Docs: http://localhost:8000/api/v1/docs
 ```
 
-**Backend runs at**: http://localhost:8000  
-**API docs at**: http://localhost:8000/api/v1/docs
-
-📖 **Full guide**: [docs/QUICK_START_BEACON.md](docs/QUICK_START_BEACON.md)
-
-### For DevOps
-
-Deploy to GCP with Terraform:
-
-```bash
-cd terraform
-terraform init
-terraform apply -var="project_id=beacon-studio-prod"
-```
-
-📖 **Full guide**: [docs/SETUP_GUIDE_BEACON.md](docs/SETUP_GUIDE_BEACON.md)
+📖 **Full setup**: [QUICK_START.md](QUICK_START.md)  
+📖 **Production deployment**: [docs/DEPLOYMENT_ROADMAP.md](docs/DEPLOYMENT_ROADMAP.md)
 
 ---
 
@@ -121,66 +99,32 @@ terraform apply -var="project_id=beacon-studio-prod"
 
 ## Documentation
 
-### Essential Guides
+**Start Here:** [QUICK_START.md](QUICK_START.md)
 
-| Document | Description |
-|----------|-------------|
-| [WORK_COMPLETED](docs/WORK_COMPLETED.md) | Complete summary of implementation work |
-| [IMPLEMENTATION_SUMMARY](docs/IMPLEMENTATION_SUMMARY.md) | What's done, what's next |
-| [QUICK_START_BEACON](docs/QUICK_START_BEACON.md) | Get running in 30 minutes |
-| [SETUP_GUIDE_BEACON](docs/SETUP_GUIDE_BEACON.md) | Production deployment guide |
-
-### Technical Documentation
-
-| Document | Description |
-|----------|-------------|
-| [beacon-studio-spec](docs/beacon-studio-spec.md) | Complete product specification |
-| [CODE_OSS_INTEGRATION](docs/CODE_OSS_INTEGRATION.md) | Frontend integration guide |
-| [BEACON_MIGRATION_PLAN](docs/BEACON_MIGRATION_PLAN.md) | 18-phase roadmap |
-| [LICENSES_BEACON](docs/LICENSES_BEACON.md) | Legal compliance & attributions |
-
-### Project Documentation
-
-| Document | Description |
-|----------|-------------|
-| [CONTRIBUTING](docs/CONTRIBUTING.md) | Contribution guidelines |
-| [SECURITY](docs/SECURITY.md) | Security policies |
-| [COLLABORATION](docs/COLLABORATION.md) | Team collaboration guide |
-
-📁 **All documentation**: [docs/](docs/)
+**Setup & Deploy:**
+1. [docs/CONFIGURATION_GUIDE.md](docs/CONFIGURATION_GUIDE.md) - Configure GCP, OAuth, Stripe
+2. [docs/DEPLOY.md](docs/DEPLOY.md) - Deploy to Google Cloud
+3. [docs/PRODUCTION_CHECKLIST.md](docs/PRODUCTION_CHECKLIST.md) - Verify deployment
+4. [docs/TROUBLESHOOTING_GCP_DEPLOYMENT.md](docs/TROUBLESHOOTING_GCP_DEPLOYMENT.md) - Fix issues
 
 ---
 
 ## Project Status
 
-### ✅ Complete (Backend)
+**Current Branch:** `blazerod`  
+**Status:** Ready for configuration and deployment
 
-- [x] PostgreSQL database schema with triggers
-- [x] FastAPI backend with all endpoints
-- [x] OAuth authentication (Google, GitHub)
-- [x] Storage management with quota enforcement
-- [x] Stripe billing integration
-- [x] AI provider integration (Gemini, LM Studio, Ollama)
-- [x] GCP infrastructure as code (Terraform)
-- [x] Admin endpoints (reconciliation, purge, stats)
-- [x] Comprehensive documentation
+### Critical Issues Fixed ✅
 
-### 🚧 In Progress (Frontend)
+- [x] Fix `Dockerfile.beacon` requirements file reference
+- [x] Protect admin endpoints with authentication  
+- [x] Configure GCS credentials fallback
 
-- [ ] Build Code OSS from source
-- [ ] Apply Beacon Studio branding
-- [ ] Implement custom file system provider
-- [ ] Create Beacon UI components
-- [ ] Deploy frontend to production
+### Next Steps
 
-### 📋 Planned
-
-- [ ] End-to-end testing
-- [ ] Security audit
-- [ ] Beta testing
-- [ ] Production launch
-
-📖 **Detailed status**: [docs/IMPLEMENTATION_SUMMARY.md](docs/IMPLEMENTATION_SUMMARY.md)
+1. **Configure services** → [docs/CONFIGURATION_GUIDE.md](docs/CONFIGURATION_GUIDE.md)
+2. **Deploy to GCP** → [docs/DEPLOY.md](docs/DEPLOY.md)
+3. **Verify deployment** → [docs/PRODUCTION_CHECKLIST.md](docs/PRODUCTION_CHECKLIST.md)
 
 ---
 
@@ -248,19 +192,24 @@ python -m app.main_beacon
 # Access at http://localhost:8000
 ```
 
-### Staging/Production
+### Production
 
 ```bash
-# Deploy infrastructure
-cd terraform
-terraform apply -var="project_id=beacon-studio-prod"
+# 1. Configure services (GCP, OAuth, Stripe)
+# See docs/CONFIGURATION_GUIDE.md
 
-# Deploy backend
-cd backend
-gcloud builds submit --config=../cloudbuild.beacon.yaml
+# 2. Deploy infrastructure
+cd terraform
+terraform apply -var="project_id=YOUR_PROJECT_ID"
+
+# 3. Deploy application
+gcloud builds submit --config cloudbuild.beacon.yaml
+
+# 4. Verify deployment
+# See docs/PRODUCTION_CHECKLIST.md
 ```
 
-📖 **Complete guide**: [docs/SETUP_GUIDE_BEACON.md](docs/SETUP_GUIDE_BEACON.md)
+📖 **Complete guide**: [docs/DEPLOY.md](docs/DEPLOY.md)
 
 ---
 
