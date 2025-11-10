@@ -60,8 +60,6 @@ data/
 !sample_notebook.ipynb
 
 # Secrets
-.env
-.env.local
 google_credentials.json
 *.key
 *.pem
