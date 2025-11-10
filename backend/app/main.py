@@ -28,7 +28,7 @@ app.include_router(notebooks.router)
 
 @app.get("/")
 async def root():
-    return {"message": "Gunpowder Splash - Collaborative IDE API by Glowstone (glowstone.red)"}
+    return {"message": "Gunpowder Splash - Collaborative IDE API by Glowstone (shlinx.com)"}
 
 @app.get("/health")
 async def health_check():

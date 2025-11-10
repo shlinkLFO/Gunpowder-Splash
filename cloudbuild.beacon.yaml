@@ -52,6 +52,8 @@ steps:
       - 'ENVIRONMENT=production'
       - '--set-secrets'
       - 'SECRET_KEY=beacon-secret-key:latest,DATABASE_URL=beacon-db-url:latest,GOOGLE_CLIENT_ID=beacon-google-client-id:latest,GOOGLE_CLIENT_SECRET=beacon-google-client-secret:latest,GITHUB_CLIENT_ID=beacon-github-client-id:latest,GITHUB_CLIENT_SECRET=beacon-github-client-secret:latest,STRIPE_API_KEY=beacon-stripe-api-key:latest,STRIPE_WEBHOOK_SECRET=beacon-stripe-webhook-secret:latest,GEMINI_API_KEY=beacon-gemini-api-key:latest'
+      - '--service-account'
+      - 'shlinx-cloud-run@webshareide.iam.gserviceaccount.com'
     id: 'deploy-backend'
 
 images:

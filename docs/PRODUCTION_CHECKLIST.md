@@ -10,7 +10,7 @@
 
 ### Configuration
 - [ ] Set `ENVIRONMENT=production` in Cloud Run
-- [ ] Configure production CORS: `["https://glowstone.red"]`
+- [ ] Configure production CORS: `["https://shlinx.com"]`
 - [ ] Set Cloud Run limits: max-instances=10, concurrency=80
 - [ ] Generate and store `ADMIN_SECRET_KEY`
 

@@ -250,12 +250,12 @@ gcloud logging read "resource.type=cloud_run_revision AND severity>=ERROR" \
 # Add domain mapping
 gcloud run domain-mappings create \
   --service=beacon-backend \
-  --domain=glowstone.red \
+  --domain=shlinx.com \
   --region=us-central1
 
 # Get DNS records to configure
 gcloud run domain-mappings describe \
-  --domain=glowstone.red \
+  --domain=shlinx.com \
   --region=us-central1
 ```
 
@@ -269,9 +269,9 @@ Add the provided DNS records to your domain registrar:
 
 After DNS propagates, update redirect URIs to use custom domain:
 ```
-https://glowstone.red/api/v1/auth/callback/google
-https://glowstone.red/api/v1/auth/callback/github
-https://glowstone.red/api/v1/billing/webhook
+https://shlinx.com/api/v1/auth/callback/google
+https://shlinx.com/api/v1/auth/callback/github
+https://shlinx.com/api/v1/billing/webhook
 ```
 
 ---

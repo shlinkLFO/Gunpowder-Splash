@@ -112,7 +112,7 @@ http://localhost:8000/api/v1/auth/callback/google
 **For Production:**
 ```
 https://YOUR-CLOUD-RUN-URL/api/v1/auth/callback/google
-https://glowstone.red/api/v1/auth/callback/google
+https://shlinx.com/api/v1/auth/callback/google
 ```
 
 ### 2.3 Save Credentials
@@ -135,10 +135,11 @@ Client Secret: GOCSPX-abc123def456
 2. Click "New OAuth App"
 3. Fill in details:
    - **Application name:** Beacon Studio
-   - **Homepage URL:** https://glowstone.red
+   - **Homepage URL:** https://shlinx.com
    - **Authorization callback URL:** 
      - Dev: `http://localhost:8000/api/v1/auth/callback/github`
-     - Prod: `https://YOUR-CLOUD-RUN-URL/api/v1/auth/callback/github`
+     - Prod (Cloud Run URL): `https://YOUR-CLOUD-RUN-URL/api/v1/auth/callback/github`
+     - Prod (Custom Domain): `https://shlinx.com/api/v1/auth/callback/github`
 
 ### 3.2 Save Credentials
 

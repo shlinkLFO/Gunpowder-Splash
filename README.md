@@ -8,7 +8,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-00a393.svg)](https://fastapi.tiangolo.com)
 
 > **Codename**: Gunpowder Splash  
-> **Production URL**: `https://glowstone.red/beacon-studio`
+> **Production URL**: `https://shlinx.com`
 
 ---
 
@@ -249,8 +249,8 @@ We welcome contributions! Please see:
 
 - **Documentation**: [docs/](docs/)
 - **Issues**: Create GitHub issues for bugs
-- **Email**: support@glowstone.red
-- **Website**: https://glowstone.red/beacon-studio
+- **Email**: support@shlinx.com
+- **Website**: https://shlinx.com
 
 ---
 

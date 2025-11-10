@@ -113,7 +113,7 @@ resource "google_storage_bucket" "beacon_files" {
   }
   
   cors {
-    origin          = ["https://glowstone.red"]
+    origin          = ["https://shlinx.com"]
     method          = ["GET", "POST", "PUT", "DELETE"]
     response_header = ["*"]
     max_age_seconds = 3600
