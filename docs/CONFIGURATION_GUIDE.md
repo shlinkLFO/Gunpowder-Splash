@@ -19,7 +19,7 @@ Step-by-step guide to configure Beacon Studio for Google Cloud Platform deployme
 
 ```bash
 # Set your project ID
-PROJECT_ID="beacon-studio-prod"
+PROJECT_ID="webshareide"
 
 # Create project
 gcloud projects create $PROJECT_ID
@@ -28,7 +28,7 @@ gcloud config set project $PROJECT_ID
 # Link billing account
 gcloud billing accounts list
 gcloud billing projects link $PROJECT_ID \
-  --billing-account=BILLING_ACCOUNT_ID
+  --billing-account=015976-E431AE-819417
 ```
 
 ### 1.2 Enable Required APIs
@@ -48,36 +48,44 @@ gcloud services enable \
 
 ```bash
 # Cloud Run service account
-gcloud iam service-accounts create beacon-cloud-run \
-  --display-name="Beacon Cloud Run Service Account"
+gcloud iam service-accounts create shlinx-cloud-run \
+  --display-name="Shlinx Cloud Run Service Account"
 
 # Cloud Scheduler service account
-gcloud iam service-accounts create beacon-scheduler \
-  --display-name="Beacon Cloud Scheduler Service Account"
+gcloud iam service-accounts create shlinx-scheduler \
+  --display-name="Shlinx Cloud Scheduler Service Account" \
+  --project=$PROJECT_ID
 
 # Grant permissions
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-  --member="serviceAccount:beacon-cloud-run@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --member="serviceAccount:shlinx-cloud-run@${PROJECT_ID}.iam.gserviceaccount.com" \
   --role="roles/cloudsql.client"
 
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-  --member="serviceAccount:beacon-cloud-run@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --member="serviceAccount:shlinx-cloud-run@${PROJECT_ID}.iam.gserviceaccount.com" \
   --role="roles/storage.objectAdmin"
 ```
 
 ### 1.4 Create Cloud Storage Bucket
 
+BUCKET_ID=gs://beacon-prod-files-${PROJECT_ID}
+
 ```bash
+# Check if bucket already exists
+gsutil ls -p $PROJECT_ID
+# To delete an old bucket and all its contents, run:
+gsutil rm -r gs://gunpowder-splash-webshareide-us-beacon-studio/
+
 # Production bucket
-gsutil mb -p $PROJECT_ID -c STANDARD -l us-central1 gs://beacon-prod-files-${PROJECT_ID}
+gsutil mb -p $PROJECT_ID -c STANDARD -l us-central1 $BUCKET_ID
 
 # Grant access to Cloud Run service account
 gsutil iam ch \
-  serviceAccount:beacon-cloud-run@${PROJECT_ID}.iam.gserviceaccount.com:roles/storage.objectAdmin \
-  gs://beacon-prod-files-${PROJECT_ID}
+  serviceAccount:shlinx-cloud-run@${PROJECT_ID}.iam.gserviceaccount.com:roles/storage.objectAdmin \
+  $BUCKET_ID
 
 # Enable versioning (optional but recommended)
-gsutil versioning set on gs://beacon-prod-files-${PROJECT_ID}
+gsutil versioning set on $BUCKET_ID
 ```
 
 ---
@@ -161,23 +169,107 @@ brew install stripe/stripe-cli/stripe
 stripe login
 
 # Create products
-stripe products create --name="Haste I" --description="20 GB storage, 5 users"
-stripe products create --name="Haste II" --description="60 GB storage, 9 users"
-stripe products create --name="Haste III" --description="240 GB storage, 17 users"
+stripe products create --name="Group Subscription" --description="20 GB storage, 5 users"
+stripe products create --name="Team Subscription" --description="60 GB storage, 9 users"
+stripe products create --name="Organization Subscription" --description="240 GB storage, 17 users"
 
 # Create prices (get product IDs from above)
-stripe prices create --product=PRODUCT_ID_1 --unit-amount=1699 --currency=usd --recurring[interval]=month
-stripe prices create --product=PRODUCT_ID_2 --unit-amount=2999 --currency=usd --recurring[interval]=month
-stripe prices create --product=PRODUCT_ID_3 --unit-amount=4999 --currency=usd --recurring[interval]=month
+stripe prices create --product=prod_TOk3uTqu9aj0gI --unit-amount=1699 --currency=usd --recurring[interval]=month
+stripe prices create --product=prod_TOk3P7kueeAZvQ --unit-amount=2999 --currency=usd --recurring.interval=month
+stripe prices create --product=prod_TOk3ldvyc2Pjjw --unit-amount=4999 --currency=usd --recurring.interval=month
 ```
 
 Save the **Price IDs** (start with `price_`).
+
+{
+  "id": "price_1SRwbdHMwyvqYV5LLSOXbt3O",
+  "object": "price",
+  "active": true,
+  "billing_scheme": "per_unit",
+  "created": 1762786929,
+  "currency": "usd",
+  "custom_unit_amount": null,
+  "livemode": false,
+  "lookup_key": null,
+  "metadata": {},
+  "nickname": null,
+  "product": "prod_TOk3uTqu9aj0gI",
+  "recurring": {
+    "interval": "month",
+    "interval_count": 1,
+    "meter": null,
+    "trial_period_days": null,
+    "usage_type": "licensed"
+  },
+  "tax_behavior": "unspecified",
+  "tiers_mode": null,
+  "transform_quantity": null,
+  "type": "recurring",
+  "unit_amount": 1699,
+  "unit_amount_decimal": "1699"
+}
+
+{
+  "id": "price_1SRwc9HMwyvqYV5LC90LqK1Y",
+  "object": "price",
+  "active": true,
+  "billing_scheme": "per_unit",
+  "created": 1762786961,
+  "currency": "usd",
+  "custom_unit_amount": null,
+  "livemode": false,
+  "lookup_key": null,
+  "metadata": {},
+  "nickname": null,
+  "product": "prod_TOk3P7kueeAZvQ",
+  "recurring": {
+    "interval": "month",
+    "interval_count": 1,
+    "meter": null,
+    "trial_period_days": null,
+    "usage_type": "licensed"
+  },
+  "tax_behavior": "unspecified",
+  "tiers_mode": null,
+  "transform_quantity": null,
+  "type": "recurring",
+  "unit_amount": 2999,
+  "unit_amount_decimal": "2999"
+}
+
+{
+  "id": "price_1SRwcGHMwyvqYV5Lu1l6Xndf",
+  "object": "price",
+  "active": true,
+  "billing_scheme": "per_unit",
+  "created": 1762786968,
+  "currency": "usd",
+  "custom_unit_amount": null,
+  "livemode": false,
+  "lookup_key": null,
+  "metadata": {},
+  "nickname": null,
+  "product": "prod_TOk3ldvyc2Pjjw",
+  "recurring": {
+    "interval": "month",
+    "interval_count": 1,
+    "meter": null,
+    "trial_period_days": null,
+    "usage_type": "licensed"
+  },
+  "tax_behavior": "unspecified",
+  "tiers_mode": null,
+  "transform_quantity": null,
+  "type": "recurring",
+  "unit_amount": 4999,
+  "unit_amount_decimal": "4999"
+}
 
 ### 4.3 Create Webhook Endpoint
 
 1. Go to: https://dashboard.stripe.com/webhooks
 2. Click "Add endpoint"
-3. Set endpoint URL: `https://YOUR-CLOUD-RUN-URL/api/v1/billing/webhook`
+3. Set endpoint URL: `https://shlinx.com/api/v1/billing/webhook`
 4. Select events:
    - `checkout.session.completed`
    - `customer.subscription.updated`
@@ -352,19 +444,155 @@ Update these locations with your production URL:
 ### 8.3 Stripe Webhook
 - Update endpoint: `https://YOUR-CLOUD-RUN-URL/api/v1/billing/webhook`
 
-### 8.4 Custom Domain (Optional)
+### 8.4 Custom Domain Setup (shlinx.com)
 
-If using custom domain (e.g., glowstone.red):
+#### Step 1: Verify Domain Ownership in Google Search Console
+
+Before mapping the domain, you must verify ownership:
+
+1. Visit: https://search.google.com/search-console
+2. Click "Add Property" → Select "Domain" (not URL prefix)
+3. Enter: `shlinx.com` → Click "Continue"
+4. Google provides a TXT record verification string like:
+   ```
+   google-site-verification=abc123xyz456...
+   ```
+
+5. Add TXT record at your domain registrar:
+   - Type: `TXT`
+   - Host: `@` (or leave blank for root domain)
+   - Value: The verification string from Google
+   - TTL: 3600 (or automatic)
+
+6. Save DNS changes, wait 2-5 minutes, then click "Verify" in Search Console
+7. Once verified, you can proceed to create the domain mapping
+
+#### Step 2: Create Domain Mapping in Cloud Run
+
+Map your verified domain to the Cloud Run service:
 
 ```bash
-# Map domain to Cloud Run
-gcloud run domain-mappings create \
+# Create domain mapping (use beta for region flag)
+gcloud beta run domain-mappings create \
   --service beacon-backend \
-  --domain glowstone.red \
+  --domain shlinx.com \
   --region us-central1
 ```
 
-Then update all OAuth redirect URIs to use your custom domain.
+This will output DNS records that you need to configure. If you need to see them again later:
+
+```bash
+# Get DNS records for configuration
+gcloud beta run domain-mappings describe \
+  --domain shlinx.com \
+  --region us-central1
+```
+
+#### Step 3: Configure DNS Records
+
+You'll receive records similar to:
+
+```
+Record Type: A
+Record Name: shlinx.com
+Record Value: 216.239.32.21, 216.239.34.21, 216.239.36.21, 216.239.38.21
+
+Record Type: AAAA
+Record Name: shlinx.com
+Record Value: 2001:4860:4802:32::15, 2001:4860:4802:34::15, ...
+```
+
+**At your DNS provider (registrar for shlinx.com):**
+
+1. Log in to your domain registrar's control panel
+2. Navigate to DNS settings for shlinx.com
+3. Add the following records:
+
+   **A Records** (add all 4):
+   - Host: `@` (or blank for root domain)
+   - Type: `A`
+   - Value: Each of the four IP addresses provided by GCP
+   - TTL: 3600 (or automatic)
+
+   **AAAA Records** (add all 4):
+   - Host: `@` (or blank for root domain)
+   - Type: `AAAA`
+   - Value: Each of the four IPv6 addresses provided by GCP
+   - TTL: 3600 (or automatic)
+
+4. Save changes and wait for DNS propagation (5-60 minutes)
+
+#### Step 4: Verify Domain Mapping
+
+Check the status:
+
+```bash
+# Check domain mapping status
+gcloud beta run domain-mappings describe \
+  --domain shlinx.com \
+  --region us-central1
+```
+
+Look for `status: "Active"` - this means SSL certificate is provisioned and domain is ready.
+
+Test the domain:
+
+```bash
+# Test health endpoint
+curl https://shlinx.com/health
+
+# Should return: {"status":"healthy",...}
+```
+
+#### Step 5: Update OAuth Providers
+
+Once domain is active, update redirect URIs in your OAuth providers:
+
+**Google OAuth Console** (https://console.cloud.google.com/apis/credentials):
+- Remove or update: `https://YOUR-CLOUD-RUN-URL/api/v1/auth/callback/google`
+- Add: `https://shlinx.com/api/v1/auth/callback/google`
+
+**GitHub OAuth App** (https://github.com/settings/developers):
+- Update Authorization callback URL to: `https://shlinx.com/api/v1/auth/callback/github`
+
+**Stripe Webhooks** (https://dashboard.stripe.com/webhooks):
+- Update endpoint URL to: `https://shlinx.com/api/v1/billing/webhook`
+
+#### Step 6: Update Environment Variables
+
+Update production environment variables in GCP Secret Manager:
+
+```bash
+# Update Google OAuth redirect URI
+echo -n "https://shlinx.com/api/v1/auth/callback/google" | \
+  gcloud secrets versions add beacon-google-redirect-uri --data-file=-
+
+# Update GitHub OAuth redirect URI
+echo -n "https://shlinx.com/api/v1/auth/callback/github" | \
+  gcloud secrets versions add beacon-github-redirect-uri --data-file=-
+
+# Redeploy to pick up changes
+gcloud builds submit --config cloudbuild.beacon.yaml
+```
+
+#### Troubleshooting Custom Domain
+
+**DNS not propagating:**
+```bash
+# Check DNS propagation
+dig shlinx.com
+nslookup shlinx.com
+```
+
+**SSL certificate pending:**
+- Cloud Run automatically provisions SSL certificates via Let's Encrypt
+- Can take 15-60 minutes after DNS is configured
+- Check status: `gcloud beta run domain-mappings describe --domain shlinx.com --region us-central1`
+
+**Domain shows as "mapping":**
+- DNS records may not be configured correctly
+- Verify A and AAAA records match exactly what GCP provided
+- Wait for DNS propagation (up to 48 hours, usually much faster)
 
 ---
 

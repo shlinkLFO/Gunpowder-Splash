@@ -7,9 +7,9 @@ steps:
     args: 
       - 'build'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/beacon-backend:$COMMIT_SHA'
+      - 'us-docker.pkg.dev/$PROJECT_ID/beacon-backend/backend:$COMMIT_SHA'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/beacon-backend:latest'
+      - 'us-docker.pkg.dev/$PROJECT_ID/beacon-backend/backend:latest'
       - '-f'
       - 'backend/Dockerfile.beacon'
       - './backend'
@@ -19,7 +19,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: 
       - 'push'
-      - 'gcr.io/$PROJECT_ID/beacon-backend:$COMMIT_SHA'
+      - 'us-docker.pkg.dev/$PROJECT_ID/beacon-backend/backend:$COMMIT_SHA'
     id: 'push-backend'
 
   # Deploy backend to Cloud Run
@@ -30,7 +30,7 @@ steps:
       - 'deploy'
       - 'beacon-backend'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/beacon-backend:$COMMIT_SHA'
+      - 'us-docker.pkg.dev/$PROJECT_ID/beacon-backend/backend:$COMMIT_SHA'
       - '--region'
       - 'us-central1'
       - '--platform'
@@ -64,8 +64,8 @@ steps:
     id: 'deploy-backend'
 
 images:
-  - 'gcr.io/$PROJECT_ID/beacon-backend:$COMMIT_SHA'
-  - 'gcr.io/$PROJECT_ID/beacon-backend:latest'
+  - 'us-docker.pkg.dev/$PROJECT_ID/beacon-backend/backend:$COMMIT_SHA'
+  - 'us-docker.pkg.dev/$PROJECT_ID/beacon-backend/backend:latest'
 
 timeout: 1200s
 
