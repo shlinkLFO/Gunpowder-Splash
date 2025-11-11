@@ -1,268 +1,295 @@
-# Beacon Studio
+# Gunpowder Splash
 
-**Multi-tenant, browser-based IDE platform built on Code OSS**
+**Open-source collaborative cloud IDE platform**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GCP](https://img.shields.io/badge/Cloud-GCP-4285F4?logo=google-cloud)](https://cloud.google.com)
+[![Live Demo](https://img.shields.io/badge/Demo-shlinx.com-blue)](https://shlinx.com)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-00a393.svg)](https://fastapi.tiangolo.com)
 
-> **Codename**: Gunpowder Splash  
-> **Production URL**: `https://shlinx.com`
+> **Live at**: [shlinx.com](https://shlinx.com)  
+> **API**: [api.shlinx.com](https://api.shlinx.com)
 
 ---
 
-## Overview
+## What is Gunpowder Splash?
 
-Beacon Studio is a production-ready, cloud-hosted IDE platform that transforms Code OSS (open-source VS Code) into a multi-tenant SaaS application with:
+Gunpowder Splash is a free, open-source collaborative IDE that runs entirely in your browser. Built with modern web technologies and designed for teams, it provides:
 
-- **Browser-based editor** - No installation required
-- **Team collaboration** - Shared workspaces with role-based access
-- **Cloud storage** - Up to 240 GB with automatic backup
-- **AI integration** - Gemini, LM Studio, and Ollama support
-- **Subscription billing** - Stripe-powered pricing tiers
-- **OAuth authentication** - Google and GitHub sign-in
+- **Browser-based coding** - No installation, just open and code
+- **Real-time collaboration** - Share workspaces with up to 1 team member (free tier)
+- **Cloud storage** - 0.84 GB free storage for all users
+- **Multiple languages** - Python, JavaScript, TypeScript, and more
+- **Data science tools** - Jupyter notebooks, CSV viewer, SQL queries
+- **OAuth authentication** - Sign in with Google or GitHub
+- **Guest mode** - Try it instantly without signing up
 
 ---
 
 ## Quick Start
 
+### Try It Now
+
+Visit [shlinx.com](https://shlinx.com) and click "Continue as Guest" to start coding immediately.
+
+### Self-Hosted Deployment
+
 ```bash
-# Clone and start with Docker Compose
+# Clone the repository
+git clone https://github.com/shlinkLFO/Gunpowder-Splash.git
+cd Gunpowder-Splash
+
+# Start with Docker Compose
 docker-compose up -d
 
 # Access
 # Frontend: http://localhost:80
-# Backend: http://localhost:8000
+# Backend API: http://localhost:8000
 # API Docs: http://localhost:8000/api/v1/docs
 ```
 
-📖 **Full setup**: [QUICK_START.md](QUICK_START.md)  
-📖 **Production deployment**: [docs/DEPLOYMENT_ROADMAP.md](docs/DEPLOYMENT_ROADMAP.md)
+📖 **Full setup guide**: [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)  
+📖 **Deployment guide**: [docs/DEPLOY.md](docs/DEPLOY.md)
 
 ---
 
 ## Features
 
-### Subscription Plans
+### Code Editor
+- **Monaco Editor** - The same editor that powers VS Code
+- **Syntax highlighting** - 50+ languages supported
+- **IntelliSense** - Code completion and suggestions
+- **Multi-file editing** - Tabs and split views
+- **File tree** - Navigate your project structure
 
-| Plan | Price | Storage | Team Size | Best For |
-|------|-------|---------|-----------|----------|
-| **Free** | $0/mo | 0.84 GB | 1 user | Personal projects |
-| **Haste I** | $16.99/mo | 20 GB | 5 users | Small teams |
-| **Haste II** | $29.99/mo | 60 GB | 9 users | Growing teams |
-| **Haste III** | $49.99/mo | 240 GB | 17 users | Large teams |
+### Data Science Tools
+- **Jupyter Notebooks** - Execute Python cells inline
+- **CSV/Excel Viewer** - Rainbow CSV with sorting and filtering
+- **SQL Query Tool** - Run SQL queries on your data
+- **Data Explorer** - Upload and analyze datasets
 
-### Core Features
-
-- **Code OSS Editor** - Full-featured IDE in your browser
+### Collaboration
+- **Shared Workspaces** - Invite team members
+- **Role-based Access** - Admin, Moderator, and User roles
 - **Project Management** - Multiple projects per workspace
-- **File Storage** - Cloud Storage with quota management
-- **Team Collaboration** - ADMIN, MOD, and USER roles
-- **AI Assistant** - Integrated code help and generation
-- **Version Control** - Built-in Git support (via Code OSS)
-- **Extensions** - Custom extension marketplace
+- **Cloud Storage** - Automatic file synchronization
+
+### Free Tier
+- **0.84 GB storage** - Generous free storage for all users
+- **1 team member** - Share with one collaborator (requires login)
+- **Unlimited projects** - Create as many projects as you need
+- **No credit card** - Start for free, upgrade when ready
+
+---
+
+## Technology Stack
+
+### Backend
+- **FastAPI** - Modern Python web framework
+- **PostgreSQL** - Relational database
+- **SQLAlchemy** - ORM and database toolkit
+- **Google Cloud Storage** - File storage
+- **Cloud Run** - Serverless deployment
+
+### Frontend
+- **React** - UI framework
+- **TypeScript** - Type-safe JavaScript
+- **Chakra UI** - Component library
+- **Monaco Editor** - Code editor
+- **Vite** - Build tool
+
+### Infrastructure
+- **Google Cloud Platform** - Cloud hosting
+- **Cloud Build** - CI/CD pipeline
+- **Cloud SQL** - Managed PostgreSQL
+- **Secret Manager** - Secure credentials
+- **Terraform** - Infrastructure as code
 
 ---
 
 ## Architecture
 
-### Technology Stack
-
-**Backend**
-- Python 3.11+ with FastAPI
-- PostgreSQL 15 (Cloud SQL)
-- Google Cloud Storage
-- Google Cloud Run (serverless)
-
-**Frontend**
-- Code OSS (MIT-licensed VS Code)
-- TypeScript + React
-- Custom file system provider
-
-**Infrastructure**
-- Google Cloud Platform
-- Terraform for IaC
-- Cloud Scheduler for cron jobs
-
-### API Endpoints
-
-- `/api/v1/auth/*` - OAuth authentication
-- `/api/v1/workspaces/*` - Workspace management
-- `/api/v1/projects/*` - Project and file operations
-- `/api/v1/billing/*` - Stripe integration
-- `/api/v1/ai/*` - AI provider integration
-
-📖 **Full API docs**: Available at `/api/v1/docs` when running
+```
+┌─────────────────┐
+│   shlinx.com    │  Frontend (React + Monaco)
+│   (Cloud Run)   │
+└────────┬────────┘
+         │
+         │ HTTPS
+         │
+┌────────▼────────┐
+│ api.shlinx.com  │  Backend API (FastAPI)
+│  (Cloud Run)    │
+└────────┬────────┘
+         │
+    ┌────┴────┬──────────┐
+    │         │          │
+┌───▼───┐ ┌──▼──┐  ┌────▼────┐
+│Cloud  │ │Cloud│  │ Secret  │
+│  SQL  │ │ GCS │  │ Manager │
+└───────┘ └─────┘  └─────────┘
+```
 
 ---
 
-## Documentation
+## API Documentation
 
-**Start Here:** [QUICK_START.md](QUICK_START.md)
+### Authentication
+- `GET /api/v1/auth/login/{provider}` - Initiate OAuth login
+- `GET /api/v1/auth/callback/{provider}` - OAuth callback
+- `GET /api/v1/auth/me` - Get current user
+- `POST /api/v1/auth/logout` - Logout
 
-**Setup & Deploy:**
-1. [docs/CONFIGURATION_GUIDE.md](docs/CONFIGURATION_GUIDE.md) - Configure GCP, OAuth, Stripe
-2. [docs/DEPLOY.md](docs/DEPLOY.md) - Deploy to Google Cloud
-3. [docs/PRODUCTION_CHECKLIST.md](docs/PRODUCTION_CHECKLIST.md) - Verify deployment
-4. [docs/TROUBLESHOOTING_GCP_DEPLOYMENT.md](docs/TROUBLESHOOTING_GCP_DEPLOYMENT.md) - Fix issues
+### Workspaces
+- `GET /api/v1/workspaces` - List workspaces
+- `POST /api/v1/workspaces` - Create workspace
+- `GET /api/v1/workspaces/{id}` - Get workspace details
+- `POST /api/v1/workspaces/{id}/members` - Add team member
+
+### Projects
+- `GET /api/v1/projects` - List projects
+- `POST /api/v1/projects` - Create project
+- `GET /api/v1/projects/{id}` - Get project details
+- `GET /api/v1/projects/{id}/files` - List files
+- `POST /api/v1/projects/{id}/files` - Upload file
+
+### Files
+- `GET /api/v1/files/{path}` - Read file
+- `PUT /api/v1/files/{path}` - Update file
+- `DELETE /api/v1/files/{path}` - Delete file
+
+📖 **Interactive API docs**: [api.shlinx.com/api/v1/docs](https://api.shlinx.com/api/v1/docs)
 
 ---
 
-## Project Status
-
-**Current Branch:** `blazerod`  
-**Status:** Ready for configuration and deployment
-
-### Critical Issues Fixed ✅
-
-- [x] Fix `Dockerfile.beacon` requirements file reference
-- [x] Protect admin endpoints with authentication  
-- [x] Configure GCS credentials fallback
-
-### Next Steps
-
-1. **Configure services** → [docs/CONFIGURATION_GUIDE.md](docs/CONFIGURATION_GUIDE.md)
-2. **Deploy to GCP** → [docs/DEPLOY.md](docs/DEPLOY.md)
-3. **Verify deployment** → [docs/PRODUCTION_CHECKLIST.md](docs/PRODUCTION_CHECKLIST.md)
-
----
-
-## Development
+## Self-Hosting
 
 ### Prerequisites
-
 - Python 3.11+
 - PostgreSQL 15+
-- Node.js 18+ (for Code OSS)
+- Node.js 20+
 - Docker (optional)
-- Google Cloud SDK (for deployment)
+- Google Cloud account (for GCS)
 
-### Project Structure
+### Environment Variables
 
-```
-Beacon Studio/
-├── README.md                   # This file
-├── docs/                       # Documentation
-│   ├── WORK_COMPLETED.md
-│   ├── QUICK_START_BEACON.md
-│   ├── SETUP_GUIDE_BEACON.md
-│   ├── CODE_OSS_INTEGRATION.md
-│   └── ...
-├── backend/                    # Python FastAPI backend
-│   ├── app/
-│   │   ├── main_beacon.py     # Main application
-│   │   ├── models.py          # ORM models
-│   │   ├── auth.py            # Authentication
-│   │   ├── storage.py         # Storage management
-│   │   ├── ai_providers.py    # AI integration
-│   │   └── routers/           # API endpoints
-│   ├── schema.sql             # Database schema
-│   ├── Dockerfile.beacon      # Production Docker
-│   └── requirements_beacon.txt
-├── frontend/                   # Code OSS integration
-│   └── src/
-│       └── beacon-components/ # Custom UI components
-├── terraform/                  # Infrastructure as code
-│   └── beacon-infrastructure.tf
-└── cloudbuild.beacon.yaml     # CI/CD pipeline
-```
-
-### Running Tests
+Create a `.env` file:
 
 ```bash
-# Backend tests
+# Database
+DATABASE_URL=postgresql://user:pass@localhost/gunpowder
+
+# Security
+SECRET_KEY=your-secret-key-here
+
+# OAuth (optional)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+
+# Storage
+GCS_BUCKET_NAME=your-bucket-name
+GCS_PROJECT_ID=your-project-id
+
+# AI (optional)
+GEMINI_API_KEY=your-gemini-key
+```
+
+### Local Development
+
+```bash
+# Backend
 cd backend
-pytest tests/
-
-# With coverage
-pytest --cov=app tests/
-```
-
----
-
-## Deployment
-
-### Development
-
-```bash
-# Local backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 python -m app.main_beacon
 
-# Access at http://localhost:8000
+# Frontend
+cd frontend
+npm install
+npm run dev
 ```
 
-### Production
+### Production Deployment
 
-```bash
-# 1. Configure services (GCP, OAuth, Stripe)
-# See docs/CONFIGURATION_GUIDE.md
-
-# 2. Deploy infrastructure
-cd terraform
-terraform apply -var="project_id=YOUR_PROJECT_ID"
-
-# 3. Deploy application
-gcloud builds submit --config cloudbuild.beacon.yaml
-
-# 4. Verify deployment
-# See docs/PRODUCTION_CHECKLIST.md
-```
-
-📖 **Complete guide**: [docs/DEPLOY.md](docs/DEPLOY.md)
-
----
-
-## Security
-
-- **Authentication**: OAuth 2.0 only (no passwords)
-- **Authorization**: Role-based access control (RBAC)
-- **Data**: Encrypted in transit and at rest
-- **Secrets**: Google Secret Manager
-- **Compliance**: GDPR/CCPA considerations, audit logging
-
-📖 **Security policy**: [docs/SECURITY.md](docs/SECURITY.md)
-
----
-
-## License
-
-- **Beacon Studio Backend**: Proprietary (SaaS product)
-- **Code OSS**: MIT License (see [docs/LICENSES_BEACON.md](docs/LICENSES_BEACON.md))
-- **Third-party dependencies**: See [docs/LICENSES_BEACON.md](docs/LICENSES_BEACON.md)
-
-**Important**: Beacon Studio is based on the MIT-licensed Code OSS project and is NOT affiliated with or endorsed by Microsoft Corporation. We do not use or redistribute the official Visual Studio Code product.
+See [docs/DEPLOY.md](docs/DEPLOY.md) for complete deployment instructions for:
+- Google Cloud Platform
+- AWS
+- Azure
+- Self-hosted servers
 
 ---
 
 ## Contributing
 
-We welcome contributions! Please see:
+We welcome contributions! Here's how to get started:
 
-- [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) - Contribution guidelines
-- [docs/COLLABORATION.md](docs/COLLABORATION.md) - Team collaboration
-- [docs/QUICK_START_BEACON.md](docs/QUICK_START_BEACON.md) - Development setup
+1. **Fork the repository**
+2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
+3. **Commit your changes** (`git commit -m 'Add amazing feature'`)
+4. **Push to the branch** (`git push origin feature/amazing-feature`)
+5. **Open a Pull Request**
 
----
+### Development Guidelines
+- Follow PEP 8 for Python code
+- Use TypeScript for frontend code
+- Write tests for new features
+- Update documentation
 
-## Support
-
-- **Documentation**: [docs/](docs/)
-- **Issues**: Create GitHub issues for bugs
-- **Email**: support@shlinx.com
-- **Website**: https://shlinx.com
+📖 **Contributing guide**: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---
 
 ## Roadmap
 
-- [x] **Phase 1**: Backend infrastructure (Complete)
-- [ ] **Phase 2**: Code OSS integration (In Progress)
-- [ ] **Phase 3**: Testing & QA
-- [ ] **Phase 4**: Beta launch
-- [ ] **Phase 5**: Production launch
+### Current (v1.0)
+- [x] Core IDE functionality
+- [x] OAuth authentication
+- [x] Cloud storage integration
+- [x] Jupyter notebook support
+- [x] CSV/Excel viewer
+- [x] Team collaboration
 
-📖 **Detailed roadmap**: [docs/BEACON_MIGRATION_PLAN.md](docs/BEACON_MIGRATION_PLAN.md)
+### Upcoming (v1.1)
+- [ ] Real-time collaborative editing
+- [ ] Terminal access
+- [ ] Git integration UI
+- [ ] Extension marketplace
+- [ ] Mobile responsive design
+- [ ] Dark/light theme toggle
+
+### Future (v2.0)
+- [ ] Video chat integration
+- [ ] Code review tools
+- [ ] CI/CD pipeline integration
+- [ ] Container deployment
+- [ ] VS Code extension compatibility
+
+---
+
+## Community
+
+- **Website**: [shlinx.com](https://shlinx.com)
+- **GitHub**: [github.com/shlinkLFO/Gunpowder-Splash](https://github.com/shlinkLFO/Gunpowder-Splash)
+- **Issues**: [Report bugs](https://github.com/shlinkLFO/Gunpowder-Splash/issues)
+- **Discussions**: [Join the conversation](https://github.com/shlinkLFO/Gunpowder-Splash/discussions)
+- **Email**: support@shlinx.com
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### Third-Party Licenses
+- **Monaco Editor**: MIT License
+- **FastAPI**: MIT License
+- **React**: MIT License
+- **Chakra UI**: MIT License
+
+See [docs/LICENSES.md](docs/LICENSES.md) for complete attributions.
 
 ---
 
@@ -270,15 +297,33 @@ We welcome contributions! Please see:
 
 Built with open-source software:
 
-- [Code OSS](https://github.com/microsoft/vscode) - MIT License
-- [FastAPI](https://fastapi.tiangolo.com/) - MIT License
-- [SQLAlchemy](https://www.sqlalchemy.org/) - MIT License
+- [Monaco Editor](https://microsoft.github.io/monaco-editor/) - The code editor that powers VS Code
+- [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework
+- [React](https://react.dev/) - UI library
+- [Chakra UI](https://chakra-ui.com/) - Component library
+- [PostgreSQL](https://www.postgresql.org/) - Database
 - [Google Cloud Platform](https://cloud.google.com/) - Infrastructure
-
-See [docs/LICENSES_BEACON.md](docs/LICENSES_BEACON.md) for complete attributions.
 
 ---
 
-**Beacon Studio** - Illuminate your code, collaborate brilliantly.
+## Security
 
-*Version 1.0.0 | Last Updated: November 8, 2025*
+Found a security vulnerability? Please email security@shlinx.com instead of opening a public issue.
+
+---
+
+## Support
+
+- **Documentation**: [docs/](docs/)
+- **FAQ**: [docs/FAQ.md](docs/FAQ.md)
+- **Troubleshooting**: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+- **Email**: support@shlinx.com
+
+---
+
+**Gunpowder Splash** - Code together, anywhere.
+
+*Open Source • Free Forever • Built for Teams*
+
+[![Deploy to GCP](https://img.shields.io/badge/Deploy-GCP-4285F4?logo=google-cloud)](docs/DEPLOY.md)
+[![Star on GitHub](https://img.shields.io/github/stars/shlinkLFO/Gunpowder-Splash?style=social)](https://github.com/shlinkLFO/Gunpowder-Splash)

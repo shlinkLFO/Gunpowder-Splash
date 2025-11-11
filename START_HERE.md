@@ -1,238 +1,208 @@
-# ✅ Critical Fixes Applied + Configuration Guide
+# Welcome to Gunpowder Splash! 
 
-## What Was Fixed
+Thank you for your interest in Gunpowder Splash - a free, open-source collaborative IDE for teams.
 
-### 1. Dockerfile Build Issue ✅
-**File:** `backend/Dockerfile.beacon`  
-**Fixed:** Changed `requirements_beacon.txt` → `requirements.txt`
+## What You'll Find Here
 
-### 2. Admin Endpoints Unprotected ✅
-**File:** `backend/app/main_beacon.py`  
-**Fixed:** Added `verify_admin_secret` dependency to all 4 admin endpoints
+Gunpowder Splash is a complete cloud IDE platform that includes:
 
-### 3. GCS Credentials ✅
-**File:** `backend/app/storage.py`  
-**Already Working:** Fallback to Cloud Run service account credentials
+- **Browser-based code editor** with Monaco (the engine behind VS Code)
+- **Data science tools** including Jupyter notebooks and CSV viewers
+- **Team collaboration** with shared workspaces
+- **Cloud storage** with 0.84 GB free for all users
+- **OAuth authentication** via Google and GitHub
+- **RESTful API** built with FastAPI
+- **Modern frontend** using React and TypeScript
 
----
+## Quick Links
 
-## 📚 Read These Files (In Order)
+### For Users
+- **Try it now**: [shlinx.com](https://shlinx.com)
+- **FAQ**: [docs/FAQ.md](docs/FAQ.md)
+- **User Guide**: [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
 
-### 1. CONFIGURATION_GUIDE.md (docs/)
-**Read this FIRST** - Most important for wiring things up
+### For Developers
+- **Setup Guide**: [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)
+- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)
+- **API Docs**: [api.shlinx.com/api/v1/docs](https://api.shlinx.com/api/v1/docs)
 
-**What it covers:**
-- ✅ Create GCP project and enable APIs
-- ✅ Set up Cloud Storage bucket
-- ✅ **Google OAuth** - Get Client ID and Secret
-- ✅ **GitHub OAuth** - Get Client ID and Secret  
-- ✅ **Stripe Setup** - Create products, get API keys, webhook secret
-- ✅ Store all secrets in GCP Secret Manager
-- ✅ Create local `.env` file
+### For DevOps
+- **Deployment**: [docs/DEPLOY.md](docs/DEPLOY.md)
+- **Configuration**: [docs/CONFIGURATION_GUIDE.md](docs/CONFIGURATION_GUIDE.md)
+- **Troubleshooting**: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
-**Time:** 1-2 hours  
-**Output:** All credentials ready, secrets in GCP
+## Getting Started
 
-**Critical sections:**
-- **Step 2:** Google OAuth Console → Get credentials
-- **Step 3:** GitHub OAuth Apps → Get credentials
-- **Step 4:** Stripe Dashboard → Create products, prices, webhook
-- **Step 5:** Store secrets in Secret Manager
+### Option 1: Try the Live Demo
 
----
+Visit [shlinx.com](https://shlinx.com) and click "Continue as Guest" to start coding immediately - no signup required!
 
-### 2. QUICK_START.md (root)
-**Read this SECOND** - Test locally before deploying
+### Option 2: Run Locally with Docker
 
-**What it covers:**
-- Fill in `.env` with credentials from Configuration Guide
-- Start Docker Compose
-- Test local backend
-- Verify OAuth login works
-- Test admin endpoints
-
-**Time:** 30 minutes  
-**Output:** Local environment running successfully
-
----
-
-### 3. DEPLOY.md (docs/)
-**Read this THIRD** - Deploy to production
-
-**What it covers:**
-- Deploy Terraform infrastructure
-- Apply database schema
-- Build and deploy via Cloud Build
-- Update OAuth redirect URIs with production URLs
-- Configure monitoring, alerts, scheduled jobs
-- (Optional) Custom domain setup
-
-**Time:** 1-2 hours  
-**Output:** Running production deployment
-
----
-
-### 4. PRODUCTION_CHECKLIST.md (docs/)
-**Read this FOURTH** - Verify everything works
-
-**What it covers:**
-- Test OAuth flows
-- Test Stripe checkout
-- Verify file operations
-- Check admin endpoints
-- Confirm monitoring
-
-**Time:** 1 hour  
-**Output:** Verified production deployment
-
----
-
-## 🎯 Your Action Plan
-
-### Today (Configuration Phase)
 ```bash
-# 1. Open CONFIGURATION_GUIDE.md
-# Follow steps 1-5 to configure all services
+# Clone the repository
+git clone https://github.com/shlinkLFO/Gunpowder-Splash.git
+cd Gunpowder-Splash
 
-# 2. Open QUICK_START.md  
-# Test everything locally
-
-# 3. Commit your changes (DO NOT commit .env!)
-git add backend/Dockerfile.beacon backend/app/main_beacon.py
-git commit -m "Fix critical deployment blockers"
-git push origin blazerod
-```
-
-### Tomorrow (Deployment Phase)
-```bash
-# 4. Open DEPLOY.md
-# Follow deployment steps
-
-# 5. Open PRODUCTION_CHECKLIST.md
-# Verify everything works
-```
-
----
-
-## 📋 What You Need
-
-### Accounts to Create/Access
-- [ ] Google Cloud Platform (with billing)
-- [ ] Google OAuth Console access
-- [ ] GitHub account (for OAuth app)
-- [ ] Stripe account (test mode is fine)
-
-### Information to Gather
-
-**From CONFIGURATION_GUIDE.md Step 2 (Google OAuth):**
-- [ ] `GOOGLE_CLIENT_ID`
-- [ ] `GOOGLE_CLIENT_SECRET`
-
-**From CONFIGURATION_GUIDE.md Step 3 (GitHub OAuth):**
-- [ ] `GITHUB_CLIENT_ID`
-- [ ] `GITHUB_CLIENT_SECRET`
-
-**From CONFIGURATION_GUIDE.md Step 4 (Stripe):**
-- [ ] `STRIPE_API_KEY`
-- [ ] `STRIPE_WEBHOOK_SECRET`
-- [ ] `STRIPE_PRICE_ID_HASTE_I`
-- [ ] `STRIPE_PRICE_ID_HASTE_II`
-- [ ] `STRIPE_PRICE_ID_HASTE_III`
-
-**From CONFIGURATION_GUIDE.md Step 5 (Generate):**
-- [ ] `SECRET_KEY` (generate with `openssl rand -hex 32`)
-- [ ] `ADMIN_SECRET_KEY` (generate with `openssl rand -hex 32`)
-
-**From CONFIGURATION_GUIDE.md Step 1 (GCP):**
-- [ ] `GCS_PROJECT_ID`
-- [ ] `GCS_BUCKET_NAME`
-
----
-
-## 🚀 Quick Commands Reference
-
-### Check if local setup works:
-```bash
+# Start all services
 docker-compose up -d
-curl http://localhost:8000/health
-# Should return: {"status":"healthy","database":"connected"}
+
+# Access the IDE
+open http://localhost:80
 ```
 
-### Test OAuth redirects:
+### Option 3: Development Setup
+
 ```bash
-# Should redirect to Google login
-open http://localhost:8000/api/v1/auth/login/google
+# Backend
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python -m app.main_beacon
 
-# Should redirect to GitHub login
-open http://localhost:8000/api/v1/auth/login/github
+# Frontend (in another terminal)
+cd frontend
+npm install
+npm run dev
 ```
 
-### Test admin endpoints:
-```bash
-# Should fail (403)
-curl -X GET http://localhost:8000/admin/stats
+See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) for detailed setup instructions.
 
-# Should succeed
-curl -X GET http://localhost:8000/admin/stats \
-  -H "X-Admin-Secret: YOUR_ADMIN_SECRET_FROM_ENV"
-```
-
----
-
-## 📝 Documentation Structure
+## Project Structure
 
 ```
-Gunpowder Splash/
-├── START_HERE.md (You are here!)
-├── SETUP_INSTRUCTIONS.md (Overview of all docs)
-├── QUICK_START.md (Local development)
-└── docs/
-    ├── CONFIGURATION_GUIDE.md ⭐ READ FIRST
-    ├── DEPLOY.md
-    ├── PRODUCTION_CHECKLIST.md
-    └── TROUBLESHOOTING_GCP_DEPLOYMENT.md
+Gunpowder-Splash/
+├── README.md                  # Project overview
+├── CONTRIBUTING.md            # How to contribute
+├── LICENSE                    # MIT License
+├── SETUP_INSTRUCTIONS.md      # Detailed setup guide
+│
+├── backend/                   # FastAPI backend
+│   ├── app/
+│   │   ├── main_beacon.py    # Main application
+│   │   ├── models.py         # Database models
+│   │   ├── routers/          # API endpoints
+│   │   └── services/         # Business logic
+│   ├── tests/                # Backend tests
+│   └── requirements.txt
+│
+├── frontend/                  # React frontend
+│   ├── src/
+│   │   ├── components/       # React components
+│   │   ├── pages/            # Page components
+│   │   └── lib/              # Utilities
+│   └── package.json
+│
+├── docs/                      # Documentation
+│   ├── FAQ.md
+│   ├── DEPLOY.md
+│   ├── CONFIGURATION_GUIDE.md
+│   └── ...
+│
+├── terraform/                 # Infrastructure as code
+└── docker-compose.yml         # Local development
 ```
 
+## Key Features
+
+### Code Editor
+- **Monaco Editor** - Industry-standard code editor
+- **50+ Languages** - Syntax highlighting for all major languages
+- **IntelliSense** - Smart code completion
+- **Multi-file Editing** - Tabs and split views
+
+### Data Science
+- **Jupyter Notebooks** - Execute Python cells inline
+- **CSV Viewer** - Rainbow CSV with sorting and filtering
+- **SQL Query Tool** - Run SQL queries on your data
+- **Data Explorer** - Upload and analyze datasets
+
+### Collaboration
+- **Shared Workspaces** - Work together in real-time
+- **Role-based Access** - Admin, Moderator, and User roles
+- **Team Management** - Invite up to 1 member (free tier)
+- **Cloud Storage** - 0.84 GB free for all users
+
+## Technology Stack
+
+**Backend**
+- Python 3.11+ with FastAPI
+- PostgreSQL 15 database
+- SQLAlchemy ORM
+- Google Cloud Storage
+- OAuth 2.0 authentication
+
+**Frontend**
+- React 19 with TypeScript
+- Chakra UI components
+- Monaco Editor
+- Vite build tool
+- Axios for API calls
+
+**Infrastructure**
+- Google Cloud Platform
+- Cloud Run (serverless)
+- Cloud SQL (managed PostgreSQL)
+- Cloud Build (CI/CD)
+- Terraform (IaC)
+
+## Next Steps
+
+### For Users
+1. Visit [shlinx.com](https://shlinx.com)
+2. Try Guest mode or sign in
+3. Create your first project
+4. Invite a team member
+
+### For Contributors
+1. Read [CONTRIBUTING.md](CONTRIBUTING.md)
+2. Set up your development environment
+3. Pick an issue or feature to work on
+4. Submit a pull request
+
+### For Self-Hosting
+1. Review [docs/DEPLOY.md](docs/DEPLOY.md)
+2. Set up your infrastructure
+3. Configure environment variables
+4. Deploy the application
+
+## Resources
+
+### Documentation
+- [README.md](README.md) - Project overview
+- [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) - Detailed setup
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [docs/FAQ.md](docs/FAQ.md) - Frequently asked questions
+- [docs/DEPLOY.md](docs/DEPLOY.md) - Deployment guide
+
+### Community
+- **GitHub**: [github.com/shlinkLFO/Gunpowder-Splash](https://github.com/shlinkLFO/Gunpowder-Splash)
+- **Issues**: [Report bugs](https://github.com/shlinkLFO/Gunpowder-Splash/issues)
+- **Discussions**: [Ask questions](https://github.com/shlinkLFO/Gunpowder-Splash/discussions)
+- **Email**: support@shlinx.com
+
+### Live Services
+- **Production**: [shlinx.com](https://shlinx.com)
+- **API**: [api.shlinx.com](https://api.shlinx.com)
+- **API Docs**: [api.shlinx.com/api/v1/docs](https://api.shlinx.com/api/v1/docs)
+
+## Support
+
+Need help? We're here for you:
+
+- **Documentation**: Check [docs/](docs/) for guides
+- **FAQ**: See [docs/FAQ.md](docs/FAQ.md) for common questions
+- **Issues**: Report bugs on [GitHub](https://github.com/shlinkLFO/Gunpowder-Splash/issues)
+- **Discussions**: Ask questions on [GitHub Discussions](https://github.com/shlinkLFO/Gunpowder-Splash/discussions)
+- **Email**: support@shlinx.com
+
+## License
+
+Gunpowder Splash is open source software licensed under the [MIT License](LICENSE).
+
 ---
 
-## ⚠️ Important Notes
+**Ready to start coding?** Visit [shlinx.com](https://shlinx.com) or follow the setup guide above!
 
-1. **DO NOT commit `.env`** - It's in `.gitignore`, keep it there
-2. **Use test mode for Stripe** during development
-3. **OAuth redirect URIs must match exactly** (http vs https, trailing slash)
-4. **Keep admin secret secure** - It protects admin endpoints
-5. **Store production secrets in Secret Manager** - Never in code
-
----
-
-## 🆘 Need Help?
-
-**Having issues?** → `docs/TROUBLESHOOTING_GCP_DEPLOYMENT.md`
-
-**Common problems covered:**
-- OAuth redirect mismatch
-- Stripe webhook signature errors
-- GCS permission denied
-- Database connection failures
-- Admin endpoint 500 errors
-
----
-
-## ✅ Success Criteria
-
-You're ready to deploy when:
-- [ ] Local Docker Compose runs without errors
-- [ ] Health check returns healthy
-- [ ] OAuth login redirects to Google/GitHub
-- [ ] Admin endpoints return 401 without secret
-- [ ] Admin endpoints work with correct secret
-- [ ] All secrets stored in GCP Secret Manager
-
----
-
-**Ready to start?**
-
-👉 Open `docs/CONFIGURATION_GUIDE.md` and begin!
-
-**Estimated time to production:** 4-5 hours total
-
+*Gunpowder Splash - Code together, anywhere.*
