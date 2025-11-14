@@ -20,7 +20,9 @@ class StorageService:
     
     def __init__(self):
         """Initialize GCS client"""
-        if settings.gcs_credentials_path:
+        import os
+        
+        if settings.gcs_credentials_path and os.path.isfile(settings.gcs_credentials_path):
             credentials = service_account.Credentials.from_service_account_file(
                 settings.gcs_credentials_path
             )
@@ -29,8 +31,14 @@ class StorageService:
                 credentials=credentials
             )
         else:
-            # Use default credentials (for Cloud Run)
-            self.client = storage.Client(project=settings.gcs_project_id)
+            # Use default credentials (for Cloud Run) or None if not available
+            try:
+                self.client = storage.Client(project=settings.gcs_project_id)
+            except Exception as e:
+                logger.warning(f"Could not initialize GCS client: {e}. Storage features disabled.")
+                self.client = None
+                self.bucket = None
+                return
         
         self.bucket = self.client.bucket(settings.gcs_bucket_name)
     
