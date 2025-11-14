@@ -1,4 +1,4 @@
-import { Box, Flex, Text, Alert } from '@chakra-ui/react'
+import { Box, Flex, Text } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
