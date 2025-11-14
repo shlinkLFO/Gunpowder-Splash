@@ -5,7 +5,6 @@ import MainContent from './components/MainContent'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import UserMenu from './components/UserMenu'
-import config from './config'
 
 type Tab = 'code-editor' | 'web-edit' | 'data-explorer' | 'query-filter' | 'templates' | 'history' | 'system'
 
