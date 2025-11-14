@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Avatar, Text, Flex } from '@chakra-ui/react'
+import { Box, Button, Stack, Text } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import config from '../config'
 
@@ -72,16 +72,38 @@ export default function UserMenu() {
 
   // If authenticated or guest mode, show profile avatar
   if (userInfo || isGuest) {
+    const displayName = userInfo?.display_name || userInfo?.email || 'Guest'
+    const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    
     return (
       <Box position="relative">
-        <Avatar
-          size="sm"
-          name={userInfo?.display_name || userInfo?.email || 'Guest'}
-          src={userInfo?.avatar_url}
+        <Box
+          as="button"
           cursor="pointer"
           onClick={() => setShowMenu(!showMenu)}
           _hover={{ opacity: 0.8 }}
-        />
+          w="32px"
+          h="32px"
+          borderRadius="full"
+          overflow="hidden"
+          bg="blue.500"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          color="white"
+          fontSize="sm"
+          fontWeight="semibold"
+        >
+          {userInfo?.avatar_url ? (
+            <img 
+              src={userInfo.avatar_url} 
+              alt={displayName}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            initials
+          )}
+        </Box>
 
         {showMenu && (
           <Box
