@@ -163,7 +163,8 @@ def get_or_create_user(
     """
     Get existing user or create new one from OAuth data
     
-    Uses PostgreSQL upsert to prevent race conditions during concurrent logins.
+    Supports account linking by email - users can log in with either Google or GitHub
+    if they use the same email address.
     
     Args:
         db: Database session
@@ -176,52 +177,50 @@ def get_or_create_user(
     Returns:
         User object (existing or newly created)
     """
-    from sqlalchemy.dialects.postgresql import insert
+    from datetime import datetime, timezone
     
-    # Use PostgreSQL upsert to atomically create or update user
-    # This prevents race conditions when multiple OAuth callbacks occur simultaneously
-    stmt = insert(User).values(
+    # First, check if a user exists with this email (account linking by email)
+    existing_user = db.query(User).filter(User.primary_email == email).first()
+    
+    if existing_user:
+        # User exists with this email - update last login and return
+        # This allows users to log in with either Google or GitHub
+        existing_user.last_login_at = datetime.now(timezone.utc)
+        
+        # Optionally update display name and avatar if not set or from same provider
+        if not existing_user.display_name and display_name:
+            existing_user.display_name = display_name
+        if not existing_user.avatar_url and avatar_url:
+            existing_user.avatar_url = avatar_url
+        
+        db.commit()
+        db.refresh(existing_user)
+        return existing_user
+    
+    # No user with this email - create new user
+    new_user = User(
         provider=provider,
         provider_user_id=provider_user_id,
         primary_email=email,
         display_name=display_name,
         avatar_url=avatar_url,
-        last_login_at=datetime.utcnow()
-    ).on_conflict_do_update(
-        # Conflict on unique constraint (provider, provider_user_id)
-        index_elements=['provider', 'provider_user_id'],
-        set_={
-            'primary_email': email,
-            'display_name': display_name,
-            'avatar_url': avatar_url,
-            'last_login_at': datetime.utcnow()
-        }
-    ).returning(User)
+        last_login_at=datetime.now(timezone.utc)
+    )
+    
+    db.add(new_user)
     
     try:
-        result = db.execute(stmt)
-        user = result.scalar_one()
         db.commit()
-        db.refresh(user)
-        return user
+        db.refresh(new_user)
+        return new_user
     except Exception as e:
         db.rollback()
-        # If upsert fails, fall back to query (should be rare)
-        user = db.query(User).filter(
-            User.provider == provider,
-            User.provider_user_id == provider_user_id
-        ).first()
-        
-        if user:
-            # Update and return existing user
-            user.primary_email = email
-            user.display_name = display_name
-            user.avatar_url = avatar_url
-            user.last_login_at = datetime.utcnow()
+        # Handle race condition - another request may have created the user
+        existing_user = db.query(User).filter(User.primary_email == email).first()
+        if existing_user:
+            existing_user.last_login_at = datetime.now(timezone.utc)
             db.commit()
-            db.refresh(user)
-            return user
-        
-        # If still no user, re-raise the original error
+            db.refresh(existing_user)
+            return existing_user
         raise
 
