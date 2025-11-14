@@ -8,7 +8,7 @@ from pydantic import BaseModel
 import secrets
 import logging
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from ..database import get_db
 from ..auth import create_access_token, create_refresh_token, get_or_create_user, get_current_user
 from ..oauth import get_oauth_provider
@@ -120,7 +120,7 @@ async def oauth_callback(
             )
         
         # Check if token expired (10 minute TTL)
-        if oauth_state.expires_at < datetime.utcnow():
+        if oauth_state.expires_at < datetime.now(timezone.utc):
             logger.error(f"State token expired at {oauth_state.expires_at}")
             db.delete(oauth_state)
             db.commit()
