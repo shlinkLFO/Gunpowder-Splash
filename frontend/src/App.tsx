@@ -68,7 +68,7 @@ function App() {
         alignItems="center"
         justifyContent="flex-end"
       >
-        <UserMenu />
+        <Box color="white">TEST HEADER</Box>
       </Flex>
 
       {/* Main Content Area */}
