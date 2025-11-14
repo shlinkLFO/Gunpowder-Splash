@@ -26,19 +26,23 @@ This installs `react-icons` which is needed for the new UserMenu component.
 #### Google OAuth
 1. Go to https://console.cloud.google.com/apis/credentials
 2. Create OAuth 2.0 Client ID (Web application type)
-3. Add authorized redirect URI:
+3. Add authorized redirect URIs (add both for flexibility):
    - Dev: `http://localhost:8000/api/v1/auth/callback/google`
-   - Prod: `https://your-domain.com/api/v1/auth/callback/google`
+   - Prod: `https://shlinx.com/api/v1/auth/callback/google`
 4. Copy the Client ID and Client Secret
 
 #### GitHub OAuth
 1. Go to https://github.com/settings/developers
 2. Click "New OAuth App"
-3. Fill in:
+3. For **Development**, fill in:
    - Application name: `Gunpowder Splash (Dev)`
    - Homepage URL: `http://localhost:5173`
    - Authorization callback URL: `http://localhost:8000/api/v1/auth/callback/github`
-4. Copy the Client ID and Client Secret
+4. For **Production**, create a separate app:
+   - Application name: `Gunpowder Splash`
+   - Homepage URL: `https://shlinx.com`
+   - Authorization callback URL: `https://shlinx.com/api/v1/auth/callback/github`
+5. Copy the Client ID and Client Secret from the appropriate app
 
 ### 3. Update Your .env File
 
@@ -185,16 +189,20 @@ If OAuth login fails:
 3. Use diagnostics endpoint to verify configuration
 4. Ensure all environment variables are set correctly
 
-## Production Deployment
+## Production Deployment (shlinx.com)
 
-When deploying to production:
+When deploying to production on shlinx.com:
 
-1. Update redirect URIs in .env to use production domain
-2. Update OAuth apps with production URLs
-3. Set `ENVIRONMENT=production`
-4. Use HTTPS (required for OAuth)
-5. Generate strong random secrets
-6. Test thoroughly before going live
+1. **Google OAuth:** 
+   - Already configured (just change redirect URI in .env to `https://shlinx.com/api/v1/auth/callback/google`)
+2. **GitHub OAuth:** 
+   - Use production app credentials
+   - Update redirect URI to `https://shlinx.com/api/v1/auth/callback/github`
+3. Set `ENVIRONMENT=production` in .env
+4. Ensure HTTPS is enabled (required for OAuth)
+5. Generate new strong random secrets for production
+6. Test OAuth flow on staging first if possible
+7. Monitor backend logs during initial production testing
 
 ---
 

@@ -8,19 +8,19 @@ This guide helps you diagnose and fix OAuth authentication issues with Google an
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
 2. Create OAuth 2.0 Client ID (Web application)
-3. Add authorized redirect URIs:
+3. Add authorized redirect URIs (you can add both to the same OAuth client):
    - Development: `http://localhost:8000/api/v1/auth/callback/google`
-   - Production: `https://your-domain.com/api/v1/auth/callback/google`
+   - Production: `https://shlinx.com/api/v1/auth/callback/google`
 4. Copy Client ID and Client Secret to your `.env` file
 
 ### GitHub OAuth Setup
 
 1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
-2. Create new OAuth App
-3. Set Authorization callback URL:
-   - Development: `http://localhost:8000/api/v1/auth/callback/github`
-   - Production: `https://your-domain.com/api/v1/auth/callback/github`
-4. Copy Client ID and Client Secret to your `.env` file
+2. Create separate OAuth Apps for dev and production (GitHub only allows one callback URL per app)
+3. Set Authorization callback URLs:
+   - Development app: `http://localhost:8000/api/v1/auth/callback/github`
+   - Production app: `https://shlinx.com/api/v1/auth/callback/github`
+4. Copy Client ID and Client Secret to your `.env` file (use appropriate app for each environment)
 
 ## Environment Variables
 

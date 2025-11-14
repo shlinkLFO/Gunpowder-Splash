@@ -15,7 +15,9 @@ Get OAuth authentication working in 5 minutes.
 1. Visit [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
 2. Create project or select existing
 3. Create OAuth 2.0 Client ID (Web application)
-4. Add authorized redirect URI: `http://localhost:8000/api/v1/auth/callback/google`
+4. Add authorized redirect URIs:
+   - **Development:** `http://localhost:8000/api/v1/auth/callback/google`
+   - **Production:** `https://shlinx.com/api/v1/auth/callback/google`
 5. Copy Client ID and Client Secret
 
 ### GitHub OAuth
@@ -23,28 +25,55 @@ Get OAuth authentication working in 5 minutes.
 1. Visit [GitHub Developer Settings](https://github.com/settings/developers)
 2. Click "New OAuth App"
 3. Fill in:
-   - Application name: `Gunpowder Splash (Dev)`
-   - Homepage URL: `http://localhost:5173`
-   - Authorization callback URL: `http://localhost:8000/api/v1/auth/callback/github`
+   - **Development:**
+     - Application name: `Gunpowder Splash (Dev)`
+     - Homepage URL: `http://localhost:5173`
+     - Authorization callback URL: `http://localhost:8000/api/v1/auth/callback/github`
+   - **Production:**
+     - Application name: `Gunpowder Splash`
+     - Homepage URL: `https://shlinx.com`
+     - Authorization callback URL: `https://shlinx.com/api/v1/auth/callback/github`
 4. Copy Client ID and Client Secret
+
+**Note:** You can add multiple redirect URIs to Google OAuth, but GitHub requires separate OAuth apps for dev and production.
 
 ## Step 2: Update Environment Variables
 
 Edit your `.env` file in the backend directory:
 
+**For Development:**
 ```bash
 # Google OAuth
 GOOGLE_CLIENT_ID=123456789-abc123.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=GOCSPX-abcdef123456
 GOOGLE_REDIRECT_URI=http://localhost:8000/api/v1/auth/callback/google
 
-# GitHub OAuth
+# GitHub OAuth (use dev app credentials)
 GITHUB_CLIENT_ID=Iv1.1234567890abcdef
 GITHUB_CLIENT_SECRET=1234567890abcdef1234567890abcdef12345678
 GITHUB_REDIRECT_URI=http://localhost:8000/api/v1/auth/callback/github
 
 # Admin Secret (generate with: openssl rand -hex 32)
 ADMIN_SECRET_KEY=your_random_secret_here
+```
+
+**For Production (shlinx.com):**
+```bash
+# Google OAuth (same client ID, different redirect URI)
+GOOGLE_CLIENT_ID=123456789-abc123.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-abcdef123456
+GOOGLE_REDIRECT_URI=https://shlinx.com/api/v1/auth/callback/google
+
+# GitHub OAuth (use production app credentials)
+GITHUB_CLIENT_ID=Iv1.production-client-id
+GITHUB_CLIENT_SECRET=production-secret-here
+GITHUB_REDIRECT_URI=https://shlinx.com/api/v1/auth/callback/github
+
+# Admin Secret (use different secret for production)
+ADMIN_SECRET_KEY=production_random_secret_here
+
+# Environment
+ENVIRONMENT=production
 ```
 
 ## Step 3: Restart Backend
@@ -152,29 +181,36 @@ Open Console (F12) to see:
 - Verify UserMenu component is imported in App.tsx
 - Ensure Chakra UI is properly configured
 
-## Production Setup
+## Production Setup (shlinx.com)
 
-For production deployment:
+For production deployment to shlinx.com:
 
-1. Update redirect URIs to production URLs:
-   ```
-   GOOGLE_REDIRECT_URI=https://your-domain.com/api/v1/auth/callback/google
-   GITHUB_REDIRECT_URI=https://your-domain.com/api/v1/auth/callback/github
-   ```
+1. **Google OAuth:**
+   - Use same OAuth client
+   - Add production redirect URI: `https://shlinx.com/api/v1/auth/callback/google`
+   - Update `.env`: `GOOGLE_REDIRECT_URI=https://shlinx.com/api/v1/auth/callback/google`
 
-2. Update OAuth provider settings with production URLs
+2. **GitHub OAuth:**
+   - Create NEW OAuth app for production
+   - Homepage: `https://shlinx.com`
+   - Callback: `https://shlinx.com/api/v1/auth/callback/github`
+   - Use production app credentials in `.env`
 
-3. Set environment to production:
-   ```
-   ENVIRONMENT=production
-   ```
-
-4. Use strong, unique secrets:
+3. **Environment Settings:**
    ```bash
-   openssl rand -hex 32
+   ENVIRONMENT=production
+   ADMIN_SECRET_KEY=$(openssl rand -hex 32)
    ```
 
-5. Enable HTTPS (required for production OAuth)
+4. **Requirements:**
+   - HTTPS enabled (required for OAuth)
+   - SSL certificate valid
+   - API accessible at `/api/v1/*` path
+
+5. **Verify:**
+   - Test OAuth flow on production
+   - Check backend logs for any redirect URI mismatches
+   - Run diagnostics endpoint to confirm configuration
 
 ## Need Help?
 
