@@ -8,6 +8,7 @@ interface UserInfo {
   display_name?: string
   avatar_url?: string
   provider: string
+  linked_providers: string[]  // Array of linked providers: ['google', 'github']
 }
 
 export default function UserMenu() {
@@ -131,7 +132,7 @@ export default function UserMenu() {
                 </Text>
                 
                 {/* Account linking buttons */}
-                {userInfo.provider === 'google' ? (
+                {!userInfo.linked_providers.includes('github') && (
                   <Button
                     onClick={() => handleLogin('github')}
                     width="100%"
@@ -141,7 +142,9 @@ export default function UserMenu() {
                   >
                     Link GitHub Account
                   </Button>
-                ) : (
+                )}
+                
+                {!userInfo.linked_providers.includes('google') && (
                   <Button
                     onClick={() => handleLogin('google')}
                     width="100%"

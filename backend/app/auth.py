@@ -164,7 +164,7 @@ def get_or_create_user(
     Get existing user or create new one from OAuth data
     
     Supports account linking by email - users can log in with either Google or GitHub
-    if they use the same email address.
+    if they use the same email address. Tracks which providers are linked.
     
     Args:
         db: Database session
@@ -178,32 +178,62 @@ def get_or_create_user(
         User object (existing or newly created)
     """
     from datetime import datetime, timezone
+    import json
     
     # First, check if a user exists with this email (account linking by email)
     existing_user = db.query(User).filter(User.primary_email == email).first()
     
     if existing_user:
-        # User exists with this email - update last login and return
-        # This allows users to log in with either Google or GitHub
+        # User exists with this email - link the provider if not already linked
         existing_user.last_login_at = datetime.now(timezone.utc)
         
-        # Optionally update display name and avatar if not set or from same provider
+        # Parse linked providers
+        try:
+            linked_providers = json.loads(existing_user.linked_providers or '[]')
+        except:
+            linked_providers = [existing_user.provider]
+        
+        # Add this provider to linked providers if not already there
+        if provider not in linked_providers:
+            linked_providers.append(provider)
+            existing_user.linked_providers = json.dumps(linked_providers)
+        
+        # Update provider-specific avatar
+        if provider == 'google' and avatar_url:
+            existing_user.google_avatar_url = avatar_url
+            # If primary provider is Google, update main avatar too
+            if existing_user.provider == 'google':
+                existing_user.avatar_url = avatar_url
+        elif provider == 'github' and avatar_url:
+            existing_user.github_avatar_url = avatar_url
+            # If primary provider is GitHub, update main avatar too
+            if existing_user.provider == 'github':
+                existing_user.avatar_url = avatar_url
+        
+        # Update display name if not set
         if not existing_user.display_name and display_name:
             existing_user.display_name = display_name
-        if not existing_user.avatar_url and avatar_url:
-            existing_user.avatar_url = avatar_url
+        
+        # Prefer Google avatar for main avatar_url if both are linked
+        if 'google' in linked_providers and existing_user.google_avatar_url:
+            existing_user.avatar_url = existing_user.google_avatar_url
         
         db.commit()
         db.refresh(existing_user)
         return existing_user
     
     # No user with this email - create new user
+    linked_providers = json.dumps([provider])
+    
     new_user = User(
         provider=provider,
         provider_user_id=provider_user_id,
         primary_email=email,
         display_name=display_name,
         avatar_url=avatar_url,
+        linked_providers=linked_providers,
+        google_avatar_url=avatar_url if provider == 'google' else None,
+        github_avatar_url=avatar_url if provider == 'github' else None,
         last_login_at=datetime.now(timezone.utc)
     )
     

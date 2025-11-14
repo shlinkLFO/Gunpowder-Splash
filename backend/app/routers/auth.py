@@ -33,6 +33,7 @@ class UserResponse(BaseModel):
     display_name: Optional[str]
     avatar_url: Optional[str]
     provider: str
+    linked_providers: list[str]  # List of linked providers ['google', 'github']
 
 
 @router.get("/login/{provider}")
@@ -211,12 +212,21 @@ async def get_current_user_info(
     Returns:
         User information
     """
+    import json
+    
+    # Parse linked providers
+    try:
+        linked_providers = json.loads(current_user.linked_providers or '[]')
+    except:
+        linked_providers = [current_user.provider]
+    
     return UserResponse(
         id=str(current_user.id),
         email=current_user.primary_email,
         display_name=current_user.display_name,
         avatar_url=current_user.avatar_url,
-        provider=current_user.provider
+        provider=current_user.provider,
+        linked_providers=linked_providers
     )
 
 

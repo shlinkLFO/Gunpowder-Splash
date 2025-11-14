@@ -29,8 +29,11 @@ class User(Base):
     primary_email = Column(String, nullable=False, unique=True, index=True)
     display_name = Column(String)
     avatar_url = Column(String)
-    provider = Column(String, nullable=False)  # 'google' or 'github'
+    provider = Column(String, nullable=False)  # Primary provider: 'google' or 'github'
     provider_user_id = Column(String, nullable=False)
+    google_avatar_url = Column(String)  # Store Google avatar separately
+    github_avatar_url = Column(String)  # Store GitHub avatar separately
+    linked_providers = Column(String, default='[]')  # JSON array of linked providers ['google', 'github']
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     last_login_at = Column(TIMESTAMP(timezone=True))
     
