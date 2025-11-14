@@ -1,24 +1,34 @@
-import { Box, Flex, Text } from '@chakra-ui/react'
+import { Box, Flex, Text, Button } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
 import LandingPage from './pages/LandingPage'
 import UserMenu from './components/UserMenu'
+import config from './config'
+
+type Tab = 'code-editor' | 'web-edit' | 'data-explorer' | 'query-filter' | 'templates' | 'history' | 'system'
 
 function App() {
   const [selectedFile, setSelectedFile] = useState<string | undefined>()
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<Tab>('code-editor')
+  const [isGuest, setIsGuest] = useState(false)
 
   useEffect(() => {
     // Check for auth token or guest mode
     const token = localStorage.getItem('auth_token')
     const guestMode = localStorage.getItem('guest_mode')
     
-    if (token || guestMode === 'true') {
+    if (token) {
       setIsAuthenticated(true)
+      setIsGuest(false)
+    } else if (guestMode === 'true') {
+      setIsAuthenticated(true)
+      setIsGuest(true)
     } else {
       setIsAuthenticated(false)
+      setIsGuest(false)
     }
 
     // Check for OAuth callback with token or error in URL
@@ -49,7 +59,23 @@ function App() {
   const handleContinueAsGuest = () => {
     localStorage.setItem('guest_mode', 'true')
     setIsAuthenticated(true)
+    setIsGuest(true)
   }
+
+  const handleLoginClick = () => {
+    const apiUrl = config.apiBaseUrl || '/api'
+    window.location.href = `${apiUrl}/v1/auth/login/google`
+  }
+
+  const tabs: { id: Tab; label: string }[] = [
+    { id: 'code-editor', label: 'Code Editor' },
+    { id: 'web-edit', label: 'Web-Edit' },
+    { id: 'data-explorer', label: 'Data Explorer' },
+    { id: 'query-filter', label: 'Query & Filter' },
+    { id: 'templates', label: 'Templates' },
+    { id: 'history', label: 'History' },
+    { id: 'system', label: 'System' },
+  ]
 
   // Loading state
   if (isAuthenticated === null) {
@@ -108,7 +134,7 @@ function App() {
         </Box>
       )}
 
-      {/* Top Header Bar */}
+      {/* Top Header Bar with Navigation */}
       <Flex
         h="50px"
         bg="gray.800"
@@ -116,18 +142,92 @@ function App() {
         borderColor="gray.700"
         px={4}
         alignItems="center"
-        justifyContent="space-between"
+        gap={6}
       >
-        <Text color="white" fontWeight="bold">Gunpowder Splash</Text>
-        <UserMenu />
+        {/* Logo */}
+        <Text color="white" fontWeight="bold" fontSize="lg" whiteSpace="nowrap">
+          Gunpowder Splash
+        </Text>
+
+        {/* Navigation Tabs */}
+        <Flex flex="1" gap={1} overflow="auto">
+          {tabs.map((tab) => (
+            <Button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              size="sm"
+              variant={activeTab === tab.id ? 'solid' : 'ghost'}
+              colorScheme={activeTab === tab.id ? 'blue' : 'gray'}
+              color={activeTab === tab.id ? 'white' : 'gray.300'}
+              _hover={{ color: 'white', bg: activeTab === tab.id ? 'blue.600' : 'gray.700' }}
+              whiteSpace="nowrap"
+            >
+              {tab.label}
+            </Button>
+          ))}
+        </Flex>
+
+        {/* User Menu or Login Button */}
+        {isGuest ? (
+          <Button
+            onClick={handleLoginClick}
+            size="sm"
+            colorScheme="blue"
+            whiteSpace="nowrap"
+          >
+            Log In
+          </Button>
+        ) : (
+          <UserMenu />
+        )}
       </Flex>
 
-      {/* Main Content Area - Temporarily simplified */}
+      {/* Main Content Area */}
       <Flex flex="1" overflow="hidden">
-        <Sidebar onFileSelect={setSelectedFile} selectedFile={selectedFile} />
-        <Box flex="1" overflow="hidden">
-          <MainContent selectedFile={selectedFile} />
-        </Box>
+        {activeTab === 'code-editor' && (
+          <>
+            <Sidebar onFileSelect={setSelectedFile} selectedFile={selectedFile} />
+            <Box flex="1" overflow="hidden">
+              <MainContent selectedFile={selectedFile} />
+            </Box>
+          </>
+        )}
+        
+        {activeTab === 'web-edit' && (
+          <Box flex="1" display="flex" alignItems="center" justifyContent="center" color="gray.400">
+            <Text>Web-Edit - Coming Soon</Text>
+          </Box>
+        )}
+        
+        {activeTab === 'data-explorer' && (
+          <Box flex="1" display="flex" alignItems="center" justifyContent="center" color="gray.400">
+            <Text>Data Explorer - Coming Soon</Text>
+          </Box>
+        )}
+        
+        {activeTab === 'query-filter' && (
+          <Box flex="1" display="flex" alignItems="center" justifyContent="center" color="gray.400">
+            <Text>Query & Filter - Coming Soon</Text>
+          </Box>
+        )}
+        
+        {activeTab === 'templates' && (
+          <Box flex="1" display="flex" alignItems="center" justifyContent="center" color="gray.400">
+            <Text>Templates - Coming Soon</Text>
+          </Box>
+        )}
+        
+        {activeTab === 'history' && (
+          <Box flex="1" display="flex" alignItems="center" justifyContent="center" color="gray.400">
+            <Text>History - Coming Soon</Text>
+          </Box>
+        )}
+        
+        {activeTab === 'system' && (
+          <Box flex="1" display="flex" alignItems="center" justifyContent="center" color="gray.400">
+            <Text>System - Coming Soon</Text>
+          </Box>
+        )}
       </Flex>
     </Flex>
   )
