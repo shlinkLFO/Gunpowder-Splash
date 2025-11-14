@@ -41,8 +41,8 @@ function App() {
       setErrorMessage(errorFromUrl)
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname)
-      // Auto-hide error after 10 seconds
-      setTimeout(() => setErrorMessage(null), 10000)
+      // Auto-hide error after 5 seconds
+      setTimeout(() => setErrorMessage(null), 5000)
     }
   }, [])
 
@@ -68,26 +68,44 @@ function App() {
   // Show main IDE
   return (
     <Flex h="100vh" bg="gray.900" flexDirection="column">
-      {/* Error Alert */}
+      {/* Error Notification */}
       {errorMessage && (
-        <Alert.Root status="error" position="absolute" top={4} left="50%" transform="translateX(-50%)" maxW="600px" zIndex={9999}>
-          <Alert.Indicator />
-          <Box flex="1">
-            <Alert.Title>Account Linking Failed</Alert.Title>
-            <Alert.Description>{errorMessage}</Alert.Description>
-          </Box>
-          <Box
-            as="button"
-            onClick={() => setErrorMessage(null)}
-            ml={2}
-            color="red.700"
-            fontWeight="bold"
-            cursor="pointer"
-            _hover={{ opacity: 0.8 }}
-          >
-            ✕
-          </Box>
-        </Alert.Root>
+        <Box
+          position="fixed"
+          top={4}
+          right={4}
+          maxW="400px"
+          bg="red.600"
+          color="white"
+          p={4}
+          borderRadius="md"
+          boxShadow="lg"
+          zIndex={9999}
+          animation="slideInRight 0.3s ease-out"
+        >
+          <Flex justifyContent="space-between" alignItems="flex-start" gap={2}>
+            <Box flex="1">
+              <Text fontWeight="bold" fontSize="sm" mb={1}>
+                Account Linking Failed
+              </Text>
+              <Text fontSize="xs" opacity={0.9}>
+                {errorMessage}
+              </Text>
+            </Box>
+            <Box
+              as="button"
+              onClick={() => setErrorMessage(null)}
+              color="white"
+              fontWeight="bold"
+              fontSize="lg"
+              cursor="pointer"
+              _hover={{ opacity: 0.7 }}
+              lineHeight="1"
+            >
+              ✕
+            </Box>
+          </Flex>
+        </Box>
       )}
 
       {/* Top Header Bar */}

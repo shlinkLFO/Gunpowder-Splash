@@ -66,7 +66,7 @@ class GoogleOAuthProvider(OAuthProvider):
             "scope": self.SCOPE,
             "state": state,
             "access_type": "offline",
-            "prompt": "consent"
+            "prompt": "select_account"  # Force account selection for linking
         }
         
         auth_url = f"{self.AUTH_URL}?{'&'.join([f'{k}={v}' for k, v in params.items()])}"
@@ -193,6 +193,7 @@ class GitHubOAuthProvider(OAuthProvider):
             "redirect_uri": settings.github_redirect_uri,
             "scope": self.SCOPE,
             "state": state,
+            "login": ""  # Force GitHub to prompt for account selection
         }
         
         auth_url = f"{self.AUTH_URL}?{'&'.join([f'{k}={v}' for k, v in params.items()])}"
