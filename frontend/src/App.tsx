@@ -44,7 +44,7 @@ function App() {
   // Loading state
   if (isAuthenticated === null) {
     return (
-      <Flex h="100vh" bg="midnight.900" alignItems="center" justifyContent="center">
+      <Flex h="100vh" bg="gray.900" alignItems="center" justifyContent="center">
         <Box color="gray.400">Loading...</Box>
       </Flex>
     )
@@ -57,18 +57,18 @@ function App() {
 
   // Show main IDE
   return (
-    <Flex h="100vh" bg="midnight.900" flexDirection="column">
+    <Flex h="100vh" bg="gray.900" flexDirection="column">
       {/* Top Header Bar */}
       <Flex
         h="50px"
-        bg="midnight.800"
+        bg="gray.900"
         borderBottom="1px solid"
-        borderColor="midnight.700"
+        borderColor="gray.700"
         px={4}
         alignItems="center"
         justifyContent="flex-end"
       >
-        <Box color="white">TEST HEADER</Box>
+        <UserMenu />
       </Flex>
 
       {/* Main Content Area */}
