@@ -136,37 +136,27 @@ export default function UserMenu() {
                 
                 {/* Account linking buttons */}
                 {!userInfo.linked_providers.includes('github') && (
-                  <Stack gap={2} width="100%">
-                    <Text color="yellow.400" fontSize="xs">
-                      Link a GitHub account that uses: {userInfo.email}
-                    </Text>
-                    <Button
-                      onClick={() => handleLogin('github', userInfo.email)}
-                      width="100%"
-                      size="sm"
-                      colorScheme="gray"
-                      variant="outline"
-                    >
-                      Link GitHub Account
-                    </Button>
-                  </Stack>
+                  <Button
+                    onClick={() => handleLogin('github', userInfo.email)}
+                    width="100%"
+                    size="sm"
+                    colorScheme="gray"
+                    variant="outline"
+                  >
+                    Link GitHub Account
+                  </Button>
                 )}
                 
                 {!userInfo.linked_providers.includes('google') && (
-                  <Stack gap={2} width="100%">
-                    <Text color="yellow.400" fontSize="xs">
-                      Link a Google account that uses: {userInfo.email}
-                    </Text>
-                    <Button
-                      onClick={() => handleLogin('google', userInfo.email)}
-                      width="100%"
-                      size="sm"
-                      colorScheme="red"
-                      variant="outline"
-                    >
-                      Link Google Account
-                    </Button>
-                  </Stack>
+                  <Button
+                    onClick={() => handleLogin('google', userInfo.email)}
+                    width="100%"
+                    size="sm"
+                    colorScheme="red"
+                    variant="outline"
+                  >
+                    Link Google Account
+                  </Button>
                 )}
                 
                 <Button
