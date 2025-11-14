@@ -1,4 +1,4 @@
-import { Box, Flex } from '@chakra-ui/react'
+import { Box, Flex, Text } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
@@ -61,17 +61,18 @@ function App() {
       {/* Top Header Bar */}
       <Flex
         h="50px"
-        bg="gray.900"
+        bg="gray.800"
         borderBottom="1px solid"
         borderColor="gray.700"
         px={4}
         alignItems="center"
-        justifyContent="flex-end"
+        justifyContent="space-between"
       >
+        <Text color="white" fontWeight="bold">Gunpowder Splash</Text>
         <UserMenu />
       </Flex>
 
-      {/* Main Content Area */}
+      {/* Main Content Area - Temporarily simplified */}
       <Flex flex="1" overflow="hidden">
         <Sidebar onFileSelect={setSelectedFile} selectedFile={selectedFile} />
         <Box flex="1" overflow="hidden">
