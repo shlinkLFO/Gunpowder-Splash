@@ -173,9 +173,15 @@ async def oauth_callback(
                 logger.error(f"Email mismatch during account linking!")
                 logger.error(f"Current account: {oauth_state.linking_user_email}")
                 logger.error(f"Provider account: {user_info.get('email')}")
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Cannot link accounts with different emails. Your {provider.title()} account uses {user_info.get('email')}, but you're logged in with {oauth_state.linking_user_email}"
+                
+                # Redirect to frontend with error message instead of throwing exception
+                from ..config import get_settings
+                settings = get_settings()
+                frontend_url = "https://shlinx.com" if settings.environment == "production" else "http://localhost:5173"
+                
+                error_msg = f"Cannot link accounts with different emails. Your {provider.title()} account uses {user_info.get('email')}, but you're logged in with {oauth_state.linking_user_email}."
+                return RedirectResponse(
+                    url=f"{frontend_url}?error={error_msg}"
                 )
             logger.info("Email verification passed - proceeding with account linking")
         

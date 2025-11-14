@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from '@chakra-ui/react'
+import { Box, Flex, Text, Alert } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
@@ -8,6 +8,7 @@ import UserMenu from './components/UserMenu'
 function App() {
   const [selectedFile, setSelectedFile] = useState<string | undefined>()
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
     // Check for auth token or guest mode
@@ -20,10 +21,12 @@ function App() {
       setIsAuthenticated(false)
     }
 
-    // Check for OAuth callback with token in URL
+    // Check for OAuth callback with token or error in URL
     const urlParams = new URLSearchParams(window.location.search)
     const tokenFromUrl = urlParams.get('token')
     const refreshTokenFromUrl = urlParams.get('refresh_token')
+    const errorFromUrl = urlParams.get('error')
+    
     if (tokenFromUrl) {
       localStorage.setItem('auth_token', tokenFromUrl)
       if (refreshTokenFromUrl) {
@@ -33,6 +36,13 @@ function App() {
       setIsAuthenticated(true)
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname)
+    } else if (errorFromUrl) {
+      // Show error message
+      setErrorMessage(errorFromUrl)
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname)
+      // Auto-hide error after 10 seconds
+      setTimeout(() => setErrorMessage(null), 10000)
     }
   }, [])
 
@@ -58,6 +68,28 @@ function App() {
   // Show main IDE
   return (
     <Flex h="100vh" bg="gray.900" flexDirection="column">
+      {/* Error Alert */}
+      {errorMessage && (
+        <Alert.Root status="error" position="absolute" top={4} left="50%" transform="translateX(-50%)" maxW="600px" zIndex={9999}>
+          <Alert.Indicator />
+          <Box flex="1">
+            <Alert.Title>Account Linking Failed</Alert.Title>
+            <Alert.Description>{errorMessage}</Alert.Description>
+          </Box>
+          <Box
+            as="button"
+            onClick={() => setErrorMessage(null)}
+            ml={2}
+            color="red.700"
+            fontWeight="bold"
+            cursor="pointer"
+            _hover={{ opacity: 0.8 }}
+          >
+            ✕
+          </Box>
+        </Alert.Root>
+      )}
+
       {/* Top Header Bar */}
       <Flex
         h="50px"
