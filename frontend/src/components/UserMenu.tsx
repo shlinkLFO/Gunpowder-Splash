@@ -25,27 +25,30 @@ export default function UserMenu() {
   }, [])
 
   const checkAuthStatus = async () => {
-    const token = localStorage.getItem('auth_token')
-    const guestMode = localStorage.getItem('guest_mode')
+    try {
+      const token = localStorage.getItem('auth_token')
+      const guestMode = localStorage.getItem('guest_mode')
 
-    if (guestMode === 'true') {
-      setIsGuest(true)
-      setLoading(false)
-      return
-    }
-
-    if (token) {
-      try {
-        const response = await axios.get(`${config.apiBaseUrl}/v1/auth/me`)
-        setUser(response.data)
-      } catch (error) {
-        console.error('Failed to fetch user info:', error)
-        localStorage.removeItem('auth_token')
-        localStorage.removeItem('refresh_token')
+      if (guestMode === 'true') {
+        setIsGuest(true)
+        setLoading(false)
+        return
       }
+
+      if (token) {
+        try {
+          const response = await axios.get(`${config.apiBaseUrl}/v1/auth/me`)
+          setUser(response.data)
+        } catch (error) {
+          console.error('Failed to fetch user info:', error)
+          // Don't remove token on error, just continue
+        }
+      }
+    } catch (error) {
+      console.error('Error in checkAuthStatus:', error)
+    } finally {
+      setLoading(false)
     }
-    
-    setLoading(false)
   }
 
   const handleLogin = (provider: 'google' | 'github') => {
