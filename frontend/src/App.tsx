@@ -116,34 +116,35 @@ function App() {
           top={4}
           right={4}
           maxW="400px"
-          bg="gray.700"
+          bg="gray.800"
           color="white"
-          p={4}
-          borderRadius="lg"
-          boxShadow="2xl"
-          border="1px solid"
-          borderColor="gray.600"
+          p={5}
+          borderRadius="md"
+          boxShadow="dark-lg"
+          border="2px solid"
+          borderColor="gray.700"
           zIndex={9999}
           animation="slideInRight 0.3s ease-out"
         >
-          <Flex justifyContent="space-between" alignItems="flex-start" gap={2}>
+          <Flex justifyContent="space-between" alignItems="flex-start" gap={3}>
             <Box flex="1">
-              <Text fontWeight="bold" fontSize="sm" mb={1} color="red.300">
+              <Text fontWeight="bold" fontSize="sm" mb={2} color="red.400">
                 Account Linking Failed
               </Text>
-              <Text fontSize="xs" opacity={0.9} color="gray.200">
+              <Text fontSize="xs" color="gray.300" lineHeight="1.5">
                 {errorMessage}
               </Text>
             </Box>
             <Box
               as="button"
               onClick={() => setErrorMessage(null)}
-              color="gray.300"
+              color="gray.400"
               fontWeight="bold"
-              fontSize="lg"
+              fontSize="xl"
               cursor="pointer"
               _hover={{ color: 'white' }}
               lineHeight="1"
+              ml={2}
             >
               ✕
             </Box>
