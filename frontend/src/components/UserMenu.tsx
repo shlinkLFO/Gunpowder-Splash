@@ -70,25 +70,18 @@ export default function UserMenu() {
     window.location.reload()
   }
 
-  // If authenticated, show user avatar/name
-  if (userInfo) {
+  // If authenticated or guest mode, show profile avatar
+  if (userInfo || isGuest) {
     return (
       <Box position="relative">
-        <Flex
-          alignItems="center"
-          gap={2}
+        <Avatar
+          size="sm"
+          name={userInfo?.display_name || userInfo?.email || 'Guest'}
+          src={userInfo?.avatar_url}
           cursor="pointer"
           onClick={() => setShowMenu(!showMenu)}
-        >
-          <Avatar
-            size="sm"
-            name={userInfo.display_name || userInfo.email}
-            src={userInfo.avatar_url}
-          />
-          <Text color="white" fontSize="sm">
-            {userInfo.display_name || userInfo.email.split('@')[0]}
-          </Text>
-        </Flex>
+          _hover={{ opacity: 0.8 }}
+        />
 
         {showMenu && (
           <Box
@@ -103,76 +96,51 @@ export default function UserMenu() {
             minW="250px"
             zIndex={1000}
           >
-            <Stack gap={2}>
-              <Text color="gray.400" fontSize="xs">
-                {userInfo.email}
-              </Text>
-              <Text color="gray.500" fontSize="xs">
-                Signed in with {userInfo.provider === 'google' ? 'Google' : 'GitHub'}
-              </Text>
-              <Button
-                onClick={handleLogout}
-                width="100%"
-                variant="outline"
-                size="sm"
-                colorScheme="red"
-              >
-                Log Out
-              </Button>
-            </Stack>
-          </Box>
-        )}
-      </Box>
-    )
-  }
-
-  // If guest mode
-  if (isGuest) {
-    return (
-      <Box position="relative">
-        <Button
-          onClick={() => setShowMenu(!showMenu)}
-          size="sm"
-          variant="ghost"
-          colorScheme="gray"
-        >
-          Guest Mode
-        </Button>
-
-        {showMenu && (
-          <Box
-            position="absolute"
-            right={0}
-            top="calc(100% + 8px)"
-            bg="gray.800"
-            borderRadius="md"
-            borderWidth="1px"
-            borderColor="gray.700"
-            p={4}
-            minW="250px"
-            zIndex={1000}
-          >
-            <Stack gap={2}>
-              <Text color="gray.400" fontSize="sm">
-                You're in guest mode
-              </Text>
-              <Button
-                onClick={() => handleLogin('google')}
-                width="100%"
-                colorScheme="red"
-                size="sm"
-              >
-                Login with Google
-              </Button>
-              <Button
-                onClick={() => handleLogin('github')}
-                width="100%"
-                colorScheme="gray"
-                size="sm"
-              >
-                Login with GitHub
-              </Button>
-            </Stack>
+            {userInfo ? (
+              <Stack gap={2}>
+                <Text color="white" fontWeight="semibold">
+                  {userInfo.display_name || userInfo.email.split('@')[0]}
+                </Text>
+                <Text color="gray.400" fontSize="xs">
+                  {userInfo.email}
+                </Text>
+                <Text color="gray.500" fontSize="xs">
+                  Signed in with {userInfo.provider === 'google' ? 'Google' : 'GitHub'}
+                </Text>
+                <Button
+                  onClick={handleLogout}
+                  width="100%"
+                  variant="outline"
+                  size="sm"
+                  colorScheme="red"
+                  mt={2}
+                >
+                  Log Out
+                </Button>
+              </Stack>
+            ) : (
+              <Stack gap={2}>
+                <Text color="gray.400" fontSize="sm">
+                  Guest Mode
+                </Text>
+                <Button
+                  onClick={() => handleLogin('google')}
+                  width="100%"
+                  colorScheme="red"
+                  size="sm"
+                >
+                  Login with Google
+                </Button>
+                <Button
+                  onClick={() => handleLogin('github')}
+                  width="100%"
+                  colorScheme="gray"
+                  size="sm"
+                >
+                  Login with GitHub
+                </Button>
+              </Stack>
+            )}
           </Box>
         )}
       </Box>
