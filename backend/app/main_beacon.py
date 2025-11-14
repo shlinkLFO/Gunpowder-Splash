@@ -11,7 +11,7 @@ import logging
 
 from .config import get_settings
 from .database import engine, Base, get_db
-from .routers import auth, workspaces, projects, billing, ai
+from .routers import auth, workspaces, projects, billing, ai, diagnostics
 from .auth import verify_admin_secret
 
 settings = get_settings()
@@ -70,6 +70,7 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Include routers
 app.include_router(auth.router, prefix=settings.api_prefix)
+app.include_router(diagnostics.router, prefix=settings.api_prefix)
 app.include_router(workspaces.router, prefix=settings.api_prefix)
 app.include_router(projects.router, prefix=settings.api_prefix)
 app.include_router(billing.router, prefix=settings.api_prefix)
