@@ -129,6 +129,30 @@ export default function UserMenu() {
                 <Text color="gray.500" fontSize="xs">
                   Signed in with {userInfo.provider === 'google' ? 'Google' : 'GitHub'}
                 </Text>
+                
+                {/* Account linking buttons */}
+                {userInfo.provider === 'google' ? (
+                  <Button
+                    onClick={() => handleLogin('github')}
+                    width="100%"
+                    size="sm"
+                    colorScheme="gray"
+                    variant="outline"
+                  >
+                    Link GitHub Account
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleLogin('google')}
+                    width="100%"
+                    size="sm"
+                    colorScheme="red"
+                    variant="outline"
+                  >
+                    Link Google Account
+                  </Button>
+                )}
+                
                 <Button
                   onClick={handleLogout}
                   width="100%"
