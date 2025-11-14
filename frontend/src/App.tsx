@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
 import LandingPage from './pages/LandingPage'
+import UserMenu from './components/UserMenu'
 
 function App() {
   const [selectedFile, setSelectedFile] = useState<string | undefined>()
@@ -56,11 +57,27 @@ function App() {
 
   // Show main IDE
   return (
-    <Flex h="100vh" bg="midnight.900">
-      <Sidebar onFileSelect={setSelectedFile} selectedFile={selectedFile} />
-      <Box flex="1" overflow="hidden">
-        <MainContent selectedFile={selectedFile} />
-      </Box>
+    <Flex h="100vh" bg="midnight.900" flexDirection="column">
+      {/* Top Header Bar */}
+      <Flex
+        h="50px"
+        bg="midnight.800"
+        borderBottom="1px solid"
+        borderColor="midnight.700"
+        px={4}
+        alignItems="center"
+        justifyContent="flex-end"
+      >
+        <UserMenu />
+      </Flex>
+
+      {/* Main Content Area */}
+      <Flex flex="1" overflow="hidden">
+        <Sidebar onFileSelect={setSelectedFile} selectedFile={selectedFile} />
+        <Box flex="1" overflow="hidden">
+          <MainContent selectedFile={selectedFile} />
+        </Box>
+      </Flex>
     </Flex>
   )
 }
