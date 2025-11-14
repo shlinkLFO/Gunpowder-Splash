@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
 import LandingPage from './pages/LandingPage'
+import LoginPage from './pages/LoginPage'
 import UserMenu from './components/UserMenu'
 import config from './config'
 
@@ -14,6 +15,7 @@ function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<Tab>('code-editor')
   const [isGuest, setIsGuest] = useState(false)
+  const [showLoginPage, setShowLoginPage] = useState(false)
 
   useEffect(() => {
     // Check for auth token or guest mode
@@ -63,8 +65,11 @@ function App() {
   }
 
   const handleLoginClick = () => {
-    const apiUrl = config.apiBaseUrl || '/api'
-    window.location.href = `${apiUrl}/v1/auth/login/google`
+    setShowLoginPage(true)
+  }
+
+  const handleBackFromLogin = () => {
+    setShowLoginPage(false)
   }
 
   const tabs: { id: Tab; label: string }[] = [
@@ -84,6 +89,11 @@ function App() {
         <Box color="gray.400">Loading...</Box>
       </Flex>
     )
+  }
+
+  // Show login page if guest user clicks "Log In"
+  if (showLoginPage) {
+    return <LoginPage onBack={handleBackFromLogin} />
   }
 
   // Show landing page if not authenticated
