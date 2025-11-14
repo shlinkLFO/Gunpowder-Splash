@@ -148,6 +148,7 @@ class OAuthState(Base):
     
     state = Column(String, primary_key=True)
     provider = Column(String, nullable=False)
+    linking_user_email = Column(String)  # Email of user requesting account linking (if applicable)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     expires_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now() + timedelta(minutes=10))
 

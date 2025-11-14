@@ -54,9 +54,12 @@ export default function UserMenu() {
     }
   }
 
-  const handleLogin = (provider: 'google' | 'github') => {
+  const handleLogin = (provider: 'google' | 'github', linkingEmail?: string) => {
     const apiUrl = config.apiBaseUrl || '/api'
-    window.location.href = `${apiUrl}/v1/auth/login/${provider}`
+    const url = linkingEmail 
+      ? `${apiUrl}/v1/auth/login/${provider}?linking_email=${encodeURIComponent(linkingEmail)}`
+      : `${apiUrl}/v1/auth/login/${provider}`
+    window.location.href = url
   }
 
   const handleGuestMode = () => {
@@ -134,7 +137,7 @@ export default function UserMenu() {
                 {/* Account linking buttons */}
                 {!userInfo.linked_providers.includes('github') && (
                   <Button
-                    onClick={() => handleLogin('github')}
+                    onClick={() => handleLogin('github', userInfo.email)}
                     width="100%"
                     size="sm"
                     colorScheme="gray"
@@ -146,7 +149,7 @@ export default function UserMenu() {
                 
                 {!userInfo.linked_providers.includes('google') && (
                   <Button
-                    onClick={() => handleLogin('google')}
+                    onClick={() => handleLogin('google', userInfo.email)}
                     width="100%"
                     size="sm"
                     colorScheme="red"

@@ -37,18 +37,25 @@ class UserResponse(BaseModel):
 
 
 @router.get("/login/{provider}")
-async def login(provider: str, db: Session = Depends(get_db)):
+async def login(
+    provider: str, 
+    linking_email: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
     """
     Initiate OAuth login flow
     
     Args:
         provider: 'google' or 'github'
+        linking_email: Email of current user (if linking accounts)
         db: Database session
         
     Returns:
         Redirect to OAuth provider
     """
     logger.info(f"=== Starting OAuth login flow for provider: {provider} ===")
+    if linking_email:
+        logger.info(f"Account linking request for email: {linking_email}")
     
     try:
         oauth = get_oauth_provider(provider)
@@ -60,7 +67,8 @@ async def login(provider: str, db: Session = Depends(get_db)):
         # Store state in database (persistent across instances)
         oauth_state = OAuthState(
             state=state,
-            provider=provider
+            provider=provider,
+            linking_user_email=linking_email  # Store email if linking
         )
         db.add(oauth_state)
         db.commit()
@@ -154,6 +162,22 @@ async def oauth_callback(
         logger.info("Fetching user info from provider...")
         user_info = await oauth.get_user_info(access_token)
         logger.info(f"User info retrieved for: {user_info.get('email')}")
+        
+        # SECURITY: Verify email matches when linking accounts
+        if oauth_state.linking_user_email:
+            logger.info(f"Account linking requested - verifying emails match")
+            logger.info(f"Expected email: {oauth_state.linking_user_email}")
+            logger.info(f"Provider email: {user_info.get('email')}")
+            
+            if oauth_state.linking_user_email != user_info.get('email'):
+                logger.error(f"Email mismatch during account linking!")
+                logger.error(f"Current account: {oauth_state.linking_user_email}")
+                logger.error(f"Provider account: {user_info.get('email')}")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Cannot link accounts with different emails. Your {provider.title()} account uses {user_info.get('email')}, but you're logged in with {oauth_state.linking_user_email}"
+                )
+            logger.info("Email verification passed - proceeding with account linking")
         
         # Get or create user in database
         logger.info("Creating or updating user in database...")
