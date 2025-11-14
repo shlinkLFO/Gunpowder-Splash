@@ -113,38 +113,39 @@ function App() {
       {errorMessage && (
         <Box
           position="fixed"
-          top={4}
-          right={4}
+          top="16px"
+          right="16px"
           maxW="400px"
-          bg="gray.800"
-          color="white"
-          p={5}
-          borderRadius="md"
-          boxShadow="dark-lg"
-          border="2px solid"
-          borderColor="gray.700"
+          backgroundColor="#374151"
+          color="#ffffff"
+          p="20px"
+          borderRadius="8px"
+          boxShadow="0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3)"
+          border="2px solid #4B5563"
           zIndex={9999}
-          animation="slideInRight 0.3s ease-out"
+          style={{
+            animation: 'slideInRight 0.3s ease-out'
+          }}
         >
-          <Flex justifyContent="space-between" alignItems="flex-start" gap={3}>
+          <Flex justifyContent="space-between" alignItems="flex-start" gap="12px">
             <Box flex="1">
-              <Text fontWeight="bold" fontSize="sm" mb={2} color="red.400">
+              <Text fontWeight="bold" fontSize="sm" mb="8px" color="#F87171">
                 Account Linking Failed
               </Text>
-              <Text fontSize="xs" color="gray.300" lineHeight="1.5">
+              <Text fontSize="xs" color="#D1D5DB" lineHeight="1.5">
                 {errorMessage}
               </Text>
             </Box>
             <Box
               as="button"
               onClick={() => setErrorMessage(null)}
-              color="gray.400"
+              color="#9CA3AF"
               fontWeight="bold"
               fontSize="xl"
               cursor="pointer"
-              _hover={{ color: 'white' }}
+              _hover={{ color: '#ffffff' }}
               lineHeight="1"
-              ml={2}
+              ml="8px"
             >
               ✕
             </Box>
