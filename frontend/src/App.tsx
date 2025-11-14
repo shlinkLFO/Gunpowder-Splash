@@ -1,15 +1,19 @@
 import { Box, Flex, Text, Button } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
-import Sidebar from './components/Sidebar'
-import MainContent from './components/MainContent'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import UserMenu from './components/UserMenu'
+import CodeEditor from './components/tabs/CodeEditor'
+import WebEdit from './components/tabs/WebEdit'
+import DataExplorer from './components/tabs/DataExplorer'
+import QueryFilter from './components/tabs/QueryFilter'
+import Templates from './components/tabs/Templates'
+import History from './components/tabs/History'
+import System from './components/tabs/System'
 
 type Tab = 'code-editor' | 'web-edit' | 'data-explorer' | 'query-filter' | 'templates' | 'history' | 'system'
 
 function App() {
-  const [selectedFile, setSelectedFile] = useState<string | undefined>()
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<Tab>('code-editor')
@@ -45,6 +49,8 @@ function App() {
       }
       localStorage.removeItem('guest_mode') // Clear guest mode if logging in
       setIsAuthenticated(true)
+      setIsGuest(false) // No longer a guest
+      setShowLoginPage(false) // Close login page if open
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname)
     } else if (errorFromUrl) {
@@ -194,52 +200,15 @@ function App() {
       </Flex>
 
       {/* Main Content Area */}
-      <Flex flex="1" overflow="hidden">
-        {activeTab === 'code-editor' && (
-          <>
-            <Sidebar onFileSelect={setSelectedFile} selectedFile={selectedFile} />
-            <Box flex="1" overflow="hidden">
-              <MainContent selectedFile={selectedFile} />
-            </Box>
-          </>
-        )}
-        
-        {activeTab === 'web-edit' && (
-          <Box flex="1" display="flex" alignItems="center" justifyContent="center" color="gray.400">
-            <Text>Web-Edit - Coming Soon</Text>
-          </Box>
-        )}
-        
-        {activeTab === 'data-explorer' && (
-          <Box flex="1" display="flex" alignItems="center" justifyContent="center" color="gray.400">
-            <Text>Data Explorer - Coming Soon</Text>
-          </Box>
-        )}
-        
-        {activeTab === 'query-filter' && (
-          <Box flex="1" display="flex" alignItems="center" justifyContent="center" color="gray.400">
-            <Text>Query & Filter - Coming Soon</Text>
-          </Box>
-        )}
-        
-        {activeTab === 'templates' && (
-          <Box flex="1" display="flex" alignItems="center" justifyContent="center" color="gray.400">
-            <Text>Templates - Coming Soon</Text>
-          </Box>
-        )}
-        
-        {activeTab === 'history' && (
-          <Box flex="1" display="flex" alignItems="center" justifyContent="center" color="gray.400">
-            <Text>History - Coming Soon</Text>
-          </Box>
-        )}
-        
-        {activeTab === 'system' && (
-          <Box flex="1" display="flex" alignItems="center" justifyContent="center" color="gray.400">
-            <Text>System - Coming Soon</Text>
-          </Box>
-        )}
-      </Flex>
+      <Box flex="1" overflow="hidden">
+        {activeTab === 'code-editor' && <CodeEditor />}
+        {activeTab === 'web-edit' && <WebEdit />}
+        {activeTab === 'data-explorer' && <DataExplorer />}
+        {activeTab === 'query-filter' && <QueryFilter />}
+        {activeTab === 'templates' && <Templates />}
+        {activeTab === 'history' && <History />}
+        {activeTab === 'system' && <System />}
+      </Box>
     </Flex>
   )
 }
