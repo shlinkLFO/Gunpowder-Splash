@@ -58,9 +58,17 @@ class CodeServerManager:
         return 8080  # All containers use same internal port, Traefik routes by path
     
     def get_user_workspace(self, user_id: Union[str, UUID]) -> Path:
-        """Get user's workspace directory"""
+        """Get user's workspace directory with proper permissions"""
         workspace = self.workspace_base / f"user_{user_id}"
         workspace.mkdir(parents=True, exist_ok=True)
+        
+        # Set ownership to UID/GID 1000 (code-server user)
+        try:
+            subprocess.run(['chown', '-R', '1000:1000', str(workspace)], check=True, timeout=5)
+            logger.info(f"Set permissions on workspace {workspace}")
+        except Exception as e:
+            logger.warning(f"Could not set workspace permissions: {e}")
+        
         return workspace
     
     def is_container_running(self, user_id: Union[str, UUID]) -> bool:
