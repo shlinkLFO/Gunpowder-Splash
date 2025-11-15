@@ -67,7 +67,6 @@ services:
       # Application
       - PYTHONUNBUFFERED=1
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - DOCKER_TLS_VERIFY=
       - APP_NAME=Beacon Studio
       - ENVIRONMENT=${ENVIRONMENT:-production}
       - DEBUG=${DEBUG:-false}
