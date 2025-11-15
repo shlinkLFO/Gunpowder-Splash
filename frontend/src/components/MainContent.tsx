@@ -8,11 +8,7 @@ import System from './tabs/System'
 import History from './tabs/History'
 import QueryFilter from './tabs/QueryFilter'
 
-interface MainContentProps {
-  selectedFile?: string
-}
-
-function MainContent({ selectedFile }: MainContentProps) {
+function MainContent() {
   const [activeTab, setActiveTab] = useState(0)
 
   const tabs = [
