@@ -21,14 +21,32 @@ class CodeServerManager:
     
     def __init__(self):
         try:
+            # Log environment for debugging
+            import os
+            logger.info(f"DOCKER_HOST env: {os.getenv('DOCKER_HOST')}")
+            logger.info(f"Docker socket exists: {os.path.exists('/var/run/docker.sock')}")
+            
+            # Check socket permissions
+            import stat
+            if os.path.exists('/var/run/docker.sock'):
+                sock_stat = os.stat('/var/run/docker.sock')
+                logger.info(f"Socket permissions: {oct(sock_stat.st_mode)}, owner: {sock_stat.st_uid}:{sock_stat.st_gid}")
+            
             # Use from_env() which properly handles DOCKER_HOST and Unix sockets
             # DOCKER_HOST is set to unix:///var/run/docker.sock in docker-compose.yml
+            logger.info("Attempting to initialize Docker client...")
             self.client = docker.from_env()
+            logger.info(f"Docker client created, testing connection...")
+            
+            # Test the connection
+            version = self.client.version()
+            logger.info(f"Docker connection successful! API version: {version.get('ApiVersion', 'unknown')}")
+            
             self.base_port = 9000  # Starting port for user instances
             self.workspace_base = Path(os.getenv("WORKSPACE_BASE", "/app/workspace"))
             logger.info("CodeServerManager initialized successfully")
         except Exception as e:
-            logger.error(f"Failed to initialize Docker client: {e}")
+            logger.error(f"Failed to initialize Docker client: {type(e).__name__}: {e}", exc_info=True)
             self.client = None
     
     def get_container_name(self, user_id: int) -> str:
