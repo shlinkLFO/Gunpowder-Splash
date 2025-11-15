@@ -70,6 +70,7 @@ services:
       - ENVIRONMENT=${ENVIRONMENT:-production}
       - DEBUG=${DEBUG:-false}
       - API_PREFIX=/api/v1
+      - DOCKER_API_VERSION=1.41  # Match host Docker daemon version
       
       # Security
       - SECRET_KEY=${SECRET_KEY}
