@@ -91,13 +91,25 @@ class CodeServerManager:
         except docker.errors.NotFound:
             pass
         
-        # Create new container
+        # Create new container with Traefik labels for auto-discovery
         try:
+            labels = {
+                "traefik.enable": "true",
+                f"traefik.http.routers.code-user-{user_id}.rule": f"Host(`shlinx.com`) && PathPrefix(`/code/user/{user_id}`)",
+                f"traefik.http.routers.code-user-{user_id}.entrypoints": "websecure",
+                f"traefik.http.routers.code-user-{user_id}.tls.certresolver": "letsencrypt",
+                f"traefik.http.services.code-user-{user_id}.loadbalancer.server.port": "8080",
+                # Strip the /code/user/{id} prefix before passing to code-server
+                f"traefik.http.middlewares.code-user-{user_id}-stripprefix.stripprefix.prefixes": f"/code/user/{user_id}",
+                f"traefik.http.routers.code-user-{user_id}.middlewares": f"code-user-{user_id}-stripprefix",
+                "gunpowder.user_id": str(user_id),
+            }
+            
             container = self.client.containers.run(
                 image="codercom/code-server:latest",
                 name=container_name,
                 detach=True,
-                ports={'8080/tcp': port},
+                network="gunpowder-splash_beacon-network",
                 volumes={
                     str(workspace.absolute()): {
                         'bind': '/home/coder/workspace',
@@ -109,6 +121,7 @@ class CodeServerManager:
                 },
                 command=['--bind-addr', '0.0.0.0:8080', '--auth', 'none', '/home/coder/workspace'],
                 user='1000:1000',
+                labels=labels,
                 restart_policy={"Name": "unless-stopped"}
             )
             

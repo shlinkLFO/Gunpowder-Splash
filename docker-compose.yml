@@ -1,6 +1,30 @@
 version: '3.8'
 
 services:
+  traefik:
+    image: traefik:v2.10
+    container_name: beacon-traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=admin@shlinx.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8081:8080"  # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-certs:/letsencrypt
+    networks:
+      - beacon-network
+    restart: unless-stopped
+
   postgres:
     image: postgres:15
     container_name: beacon-postgres
@@ -13,6 +37,8 @@ services:
       - ./backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     ports:
       - "5432:5432"
+    networks:
+      - beacon-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -82,6 +108,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - beacon-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`shlinx.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -89,45 +123,37 @@ services:
       timeout: 10s
       retries: 3
 
-  # Note: This is a single shared code-server instance
-  # For production multi-user, each user needs their own container
-  # See docs/VSCODE_INTEGRATION.md for scaling strategy
-  code-server:
-    image: codercom/code-server:latest
-    container_name: beacon-code-server
-    ports:
-      - "8080:8080"
-    volumes:
-      # Mount entire workspace directory - users get subdirectories
-      - ./backend/workspace:/home/coder/workspace
-      - code-server-config:/home/coder/.config
-      - code-server-local:/home/coder/.local
-    environment:
-      # Disable password for now since users are already authenticated
-      # TODO: Implement per-user containers with proper isolation
-      - PASSWORD=
-    command: --bind-addr 0.0.0.0:8080 --auth none /home/coder/workspace
-    restart: unless-stopped
-    user: "1000:1000"
+  # Note: code-server containers are dynamically created per-user by backend
+  # See backend/app/services/code_server_manager.py
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: beacon-frontend
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+    networks:
+      - beacon-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`shlinx.com`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      # HTTP to HTTPS redirect
+      - "traefik.http.routers.frontend-http.rule=Host(`shlinx.com`)"
+      - "traefik.http.routers.frontend-http.entrypoints=web"
+      - "traefik.http.routers.frontend-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     depends_on:
       - backend
-      - code-server
     restart: unless-stopped
+
+networks:
+  beacon-network:
+    driver: bridge
 
 volumes:
   postgres_data:
   workspace:
-  code-server-config:
-  code-server-local:
+  traefik-certs:
 
