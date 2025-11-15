@@ -131,6 +131,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: beacon-frontend
+    # No ports exposed - Traefik handles external access
     networks:
       - beacon-network
     labels:
