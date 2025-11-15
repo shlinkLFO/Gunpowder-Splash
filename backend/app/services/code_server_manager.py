@@ -1,21 +1,28 @@
 """
 Code Server Manager: Handle per-user VS Code container lifecycle
 """
+import logging
+
+# Set up logger FIRST so we can log the monkeypatch attempt
+logger = logging.getLogger(__name__)
+
 # CRITICAL: Monkeypatch BEFORE importing docker
 # This registers Unix socket support in urllib3/requests
 try:
+    logger.info("Attempting to import requests_unixsocket...")
     import requests_unixsocket
+    logger.info("Calling monkeypatch()...")
     requests_unixsocket.monkeypatch()
-except ImportError:
-    pass
+    logger.info("Monkeypatch successful!")
+except ImportError as e:
+    logger.error(f"Failed to import requests_unixsocket: {e}")
+except Exception as e:
+    logger.error(f"Failed to monkeypatch: {e}")
 
 import docker
-import logging
 from pathlib import Path
 from typing import Optional, Dict
 import os
-
-logger = logging.getLogger(__name__)
 
 class CodeServerManager:
     """
