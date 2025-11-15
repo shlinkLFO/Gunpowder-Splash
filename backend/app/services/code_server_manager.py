@@ -7,8 +7,9 @@ import logging
 import subprocess
 import json
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Optional, Dict, Union
 import os
+from uuid import UUID
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ class CodeServerManager:
     
     Each user gets their own isolated code-server instance with:
     - Private workspace directory
-    - Unique port assignment
+    - Routed via Traefik (no unique ports needed)
     - Automatic startup/shutdown
     """
     
@@ -41,7 +42,6 @@ class CodeServerManager:
                 logger.error(f"Docker CLI test failed: {result.stderr}")
                 self.available = False
             
-            self.base_port = 9000  # Starting port for user instances
             self.workspace_base = Path(os.getenv("WORKSPACE_BASE", "/app/workspace"))
             logger.info("CodeServerManager initialized successfully")
             
@@ -49,21 +49,21 @@ class CodeServerManager:
             logger.error(f"Failed to initialize CodeServerManager: {e}")
             self.available = False
     
-    def get_container_name(self, user_id: int) -> str:
+    def get_container_name(self, user_id: Union[str, UUID]) -> str:
         """Generate unique container name for user"""
-        return f"code-server-user-{user_id}"
+        return f"code-server-user-{str(user_id)}"
     
-    def get_user_port(self, user_id: int) -> int:
-        """Assign unique port to user (simple allocation for now)"""
-        return self.base_port + user_id
+    def get_user_port(self, user_id: Union[str, UUID]) -> int:
+        """Return internal port (all containers use 8080, Traefik handles routing)"""
+        return 8080  # All containers use same internal port, Traefik routes by path
     
-    def get_user_workspace(self, user_id: int) -> Path:
+    def get_user_workspace(self, user_id: Union[str, UUID]) -> Path:
         """Get user's workspace directory"""
         workspace = self.workspace_base / f"user_{user_id}"
         workspace.mkdir(parents=True, exist_ok=True)
         return workspace
     
-    def is_container_running(self, user_id: int) -> bool:
+    def is_container_running(self, user_id: Union[str, UUID]) -> bool:
         """Check if user's code-server container is running"""
         if not self.available:
             return False
@@ -80,7 +80,7 @@ class CodeServerManager:
             logger.error(f"Error checking container status: {e}")
             return False
     
-    def start_user_container(self, user_id: int) -> Dict:
+    def start_user_container(self, user_id: Union[str, UUID]) -> Dict:
         """
         Start a code-server container for the user using Docker CLI
         Returns container info including port
@@ -162,7 +162,7 @@ class CodeServerManager:
             logger.error(f"Failed to create container: {e}")
             raise
     
-    def stop_user_container(self, user_id: int) -> bool:
+    def stop_user_container(self, user_id: Union[str, UUID]) -> bool:
         """Stop user's code-server container using Docker CLI"""
         if not self.available:
             return False
@@ -184,7 +184,7 @@ class CodeServerManager:
             logger.error(f"Error stopping container: {e}")
             return False
     
-    def remove_user_container(self, user_id: int) -> bool:
+    def remove_user_container(self, user_id: Union[str, UUID]) -> bool:
         """Remove user's code-server container using Docker CLI"""
         if not self.available:
             return False
@@ -206,7 +206,7 @@ class CodeServerManager:
             logger.error(f"Error removing container: {e}")
             return False
     
-    def get_user_container_url(self, user_id: int, base_url: str) -> Optional[str]:
+    def get_user_container_url(self, user_id: Union[str, UUID], base_url: str) -> Optional[str]:
         """Get the URL to access user's code-server"""
         if not self.is_container_running(user_id):
             return None
