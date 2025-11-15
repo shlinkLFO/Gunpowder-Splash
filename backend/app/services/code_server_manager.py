@@ -1,6 +1,14 @@
 """
 Code Server Manager: Handle per-user VS Code container lifecycle
 """
+# CRITICAL: Monkeypatch BEFORE importing docker
+# This registers Unix socket support in urllib3/requests
+try:
+    import requests_unixsocket
+    requests_unixsocket.monkeypatch()
+except ImportError:
+    pass
+
 import docker
 import logging
 from pathlib import Path
