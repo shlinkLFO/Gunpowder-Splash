@@ -31,6 +31,7 @@ services:
     volumes:
       - ./backend/workspace:/app/workspace
       - ./backend/app:/app/app
+      - /var/run/docker.sock:/var/run/docker.sock  # Allow backend to manage Docker containers
       # - ./google_credentials.json:/app/google_credentials.json:ro
     environment:
       # Application
@@ -88,19 +89,24 @@ services:
       timeout: 10s
       retries: 3
 
+  # Note: This is a single shared code-server instance
+  # For production multi-user, each user needs their own container
+  # See docs/VSCODE_INTEGRATION.md for scaling strategy
   code-server:
     image: codercom/code-server:latest
     container_name: beacon-code-server
     ports:
       - "8080:8080"
     volumes:
+      # Mount entire workspace directory - users get subdirectories
       - ./backend/workspace:/home/coder/workspace
       - code-server-config:/home/coder/.config
       - code-server-local:/home/coder/.local
     environment:
-      - PASSWORD=${CODE_SERVER_PASSWORD:-changeme}
-      - SUDO_PASSWORD=${CODE_SERVER_PASSWORD:-changeme}
-    command: --bind-addr 0.0.0.0:8080 --auth password /home/coder/workspace
+      # Disable password for now since users are already authenticated
+      # TODO: Implement per-user containers with proper isolation
+      - PASSWORD=
+    command: --bind-addr 0.0.0.0:8080 --auth none /home/coder/workspace
     restart: unless-stopped
     user: "1000:1000"
 
