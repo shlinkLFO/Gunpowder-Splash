@@ -38,7 +38,6 @@ class CodeServerManager:
         try:
             # Log environment for debugging
             import os
-            logger.info(f"DOCKER_HOST env: {os.getenv('DOCKER_HOST')}")
             logger.info(f"Docker socket exists: {os.path.exists('/var/run/docker.sock')}")
             
             # Check socket permissions
@@ -47,10 +46,10 @@ class CodeServerManager:
                 sock_stat = os.stat('/var/run/docker.sock')
                 logger.info(f"Socket permissions: {oct(sock_stat.st_mode)}, owner: {sock_stat.st_uid}:{sock_stat.st_gid}")
             
-            # Use from_env() which properly handles DOCKER_HOST and Unix sockets
-            # DOCKER_HOST is set to unix:///var/run/docker.sock in docker-compose.yml
-            logger.info("Attempting to initialize Docker client...")
-            self.client = docker.from_env()
+            # Docker SDK has native Unix socket support - just pass the socket path directly
+            # This uses docker's built-in UnixHTTPAdapter, bypassing the http+docker scheme issue
+            logger.info("Attempting to initialize Docker client with unix socket...")
+            self.client = docker.DockerClient(base_url='unix://var/run/docker.sock')
             logger.info(f"Docker client created, testing connection...")
             
             # Test the connection
