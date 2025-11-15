@@ -21,8 +21,8 @@ class CodeServerManager:
     
     def __init__(self):
         try:
-            # Connect to Docker socket
-            self.client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+            # Connect to Docker socket (note: three slashes after unix:)
+            self.client = docker.DockerClient(base_url='unix:///var/run/docker.sock')
             self.base_port = 9000  # Starting port for user instances
             self.workspace_base = Path(os.getenv("WORKSPACE_BASE", "/app/workspace"))
             logger.info("CodeServerManager initialized successfully")
