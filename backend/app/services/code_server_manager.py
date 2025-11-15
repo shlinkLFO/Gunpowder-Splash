@@ -1,28 +1,16 @@
 """
 Code Server Manager: Handle per-user VS Code container lifecycle
+
+Uses Docker CLI via subprocess instead of Python SDK to avoid Unix socket issues.
 """
 import logging
-
-# Set up logger FIRST so we can log the monkeypatch attempt
-logger = logging.getLogger(__name__)
-
-# CRITICAL: Monkeypatch BEFORE importing docker
-# This registers Unix socket support in urllib3/requests
-try:
-    logger.info("Attempting to import requests_unixsocket...")
-    import requests_unixsocket
-    logger.info("Calling monkeypatch()...")
-    requests_unixsocket.monkeypatch()
-    logger.info("Monkeypatch successful!")
-except ImportError as e:
-    logger.error(f"Failed to import requests_unixsocket: {e}")
-except Exception as e:
-    logger.error(f"Failed to monkeypatch: {e}")
-
-import docker
+import subprocess
+import json
 from pathlib import Path
 from typing import Optional, Dict
 import os
+
+logger = logging.getLogger(__name__)
 
 class CodeServerManager:
     """
@@ -35,33 +23,31 @@ class CodeServerManager:
     """
     
     def __init__(self):
+        """Initialize manager using Docker CLI instead of Python SDK"""
         try:
-            # Log environment for debugging
-            import os
-            logger.info(f"Docker socket exists: {os.path.exists('/var/run/docker.sock')}")
+            # Test Docker CLI is available
+            result = subprocess.run(
+                ['docker', 'version', '--format', '{{.Server.Version}}'],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
             
-            # Check socket permissions
-            import stat
-            if os.path.exists('/var/run/docker.sock'):
-                sock_stat = os.stat('/var/run/docker.sock')
-                logger.info(f"Socket permissions: {oct(sock_stat.st_mode)}, owner: {sock_stat.st_uid}:{sock_stat.st_gid}")
-            
-            # Docker SDK has native Unix socket support - just pass the socket path directly
-            # This uses docker's built-in UnixHTTPAdapter, bypassing the http+docker scheme issue
-            logger.info("Attempting to initialize Docker client with unix socket...")
-            self.client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-            logger.info(f"Docker client created, testing connection...")
-            
-            # Test the connection
-            version = self.client.version()
-            logger.info(f"Docker connection successful! API version: {version.get('ApiVersion', 'unknown')}")
+            if result.returncode == 0:
+                version = result.stdout.strip()
+                logger.info(f"Docker CLI available, server version: {version}")
+                self.available = True
+            else:
+                logger.error(f"Docker CLI test failed: {result.stderr}")
+                self.available = False
             
             self.base_port = 9000  # Starting port for user instances
             self.workspace_base = Path(os.getenv("WORKSPACE_BASE", "/app/workspace"))
             logger.info("CodeServerManager initialized successfully")
+            
         except Exception as e:
-            logger.error(f"Failed to initialize Docker client: {type(e).__name__}: {e}", exc_info=True)
-            self.client = None
+            logger.error(f"Failed to initialize CodeServerManager: {e}")
+            self.available = False
     
     def get_container_name(self, user_id: int) -> str:
         """Generate unique container name for user"""
@@ -79,127 +65,143 @@ class CodeServerManager:
     
     def is_container_running(self, user_id: int) -> bool:
         """Check if user's code-server container is running"""
-        if not self.client:
+        if not self.available:
             return False
         
         try:
-            container = self.client.containers.get(self.get_container_name(user_id))
-            return container.status == 'running'
-        except docker.errors.NotFound:
-            return False
+            result = subprocess.run(
+                ['docker', 'inspect', '--format', '{{.State.Running}}', self.get_container_name(user_id)],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            return result.returncode == 0 and result.stdout.strip() == 'true'
         except Exception as e:
             logger.error(f"Error checking container status: {e}")
             return False
     
     def start_user_container(self, user_id: int) -> Dict:
         """
-        Start a code-server container for the user
+        Start a code-server container for the user using Docker CLI
         Returns container info including port
         """
-        if not self.client:
-            raise Exception("Docker client not available")
+        if not self.available:
+            raise Exception("Docker not available")
         
         container_name = self.get_container_name(user_id)
         port = self.get_user_port(user_id)
         workspace = self.get_user_workspace(user_id)
         
-        # Check if container already exists
-        try:
-            container = self.client.containers.get(container_name)
-            if container.status == 'running':
-                logger.info(f"Container {container_name} already running")
-                return {
-                    "status": "running",
-                    "port": port,
-                    "container_id": container.id
-                }
-            else:
-                # Restart existing container
-                container.start()
-                logger.info(f"Restarted container {container_name}")
-                return {
-                    "status": "started",
-                    "port": port,
-                    "container_id": container.id
-                }
-        except docker.errors.NotFound:
-            pass
-        
-        # Create new container with Traefik labels for auto-discovery
-        try:
-            labels = {
-                "traefik.enable": "true",
-                f"traefik.http.routers.code-user-{user_id}.rule": f"Host(`shlinx.com`) && PathPrefix(`/code/user/{user_id}`)",
-                f"traefik.http.routers.code-user-{user_id}.entrypoints": "websecure",
-                f"traefik.http.routers.code-user-{user_id}.tls.certresolver": "letsencrypt",
-                f"traefik.http.services.code-user-{user_id}.loadbalancer.server.port": "8080",
-                # Strip the /code/user/{id} prefix before passing to code-server
-                f"traefik.http.middlewares.code-user-{user_id}-stripprefix.stripprefix.prefixes": f"/code/user/{user_id}",
-                f"traefik.http.routers.code-user-{user_id}.middlewares": f"code-user-{user_id}-stripprefix",
-                "gunpowder.user_id": str(user_id),
+        # Check if container already exists and is running
+        if self.is_container_running(user_id):
+            logger.info(f"Container {container_name} already running")
+            return {
+                "status": "running",
+                "port": port,
+                "container_id": container_name
             }
-            
-            container = self.client.containers.run(
-                image="codercom/code-server:latest",
-                name=container_name,
-                detach=True,
-                network="gunpowder-splash_beacon-network",
-                volumes={
-                    str(workspace.absolute()): {
-                        'bind': '/home/coder/workspace',
-                        'mode': 'rw'
-                    }
-                },
-                environment={
-                    'PASSWORD': '',  # No password - auth handled by main app
-                },
-                command=['--bind-addr', '0.0.0.0:8080', '--auth', 'none', '/home/coder/workspace'],
-                user='1000:1000',
-                labels=labels,
-                restart_policy={"Name": "unless-stopped"}
-            )
-            
-            logger.info(f"Created container {container_name} on port {port}")
+        
+        # Check if container exists but is stopped
+        check_result = subprocess.run(
+            ['docker', 'inspect', '--format', '{{.State.Status}}', container_name],
+            capture_output=True,
+            text=True
+        )
+        
+        if check_result.returncode == 0:
+            # Container exists, just start it
+            subprocess.run(['docker', 'start', container_name], check=True)
+            logger.info(f"Restarted container {container_name}")
+            return {
+                "status": "started",
+                "port": port,
+                "container_id": container_name
+            }
+        
+        # Create new container using Docker CLI
+        logger.info(f"Creating new container {container_name}")
+        
+        cmd = [
+            'docker', 'run',
+            '--name', container_name,
+            '--detach',
+            '--network', 'gunpowder-splash_beacon-network',
+            '--volume', f'{workspace.absolute()}:/home/coder/workspace:rw',
+            '--user', '1000:1000',
+            '--restart', 'unless-stopped',
+            # Traefik labels
+            '--label', 'traefik.enable=true',
+            '--label', f'traefik.http.routers.code-user-{user_id}.rule=Host(`shlinx.com`) && PathPrefix(`/code/user/{user_id}`)',
+            '--label', f'traefik.http.routers.code-user-{user_id}.entrypoints=websecure',
+            '--label', f'traefik.http.routers.code-user-{user_id}.tls.certresolver=letsencrypt',
+            '--label', f'traefik.http.services.code-user-{user_id}.loadbalancer.server.port=8080',
+            '--label', f'traefik.http.middlewares.code-user-{user_id}-stripprefix.stripprefix.prefixes=/code/user/{user_id}',
+            '--label', f'traefik.http.routers.code-user-{user_id}.middlewares=code-user-{user_id}-stripprefix',
+            '--label', f'gunpowder.user_id={user_id}',
+            'codercom/code-server:latest',
+            '--bind-addr', '0.0.0.0:8080',
+            '--auth', 'none',
+            '/home/coder/workspace'
+        ]
+        
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=30)
+            container_id = result.stdout.strip()
+            logger.info(f"Created container {container_name} (ID: {container_id[:12]})")
             
             return {
                 "status": "created",
                 "port": port,
-                "container_id": container.id,
+                "container_id": container_id,
                 "workspace": str(workspace)
             }
-            
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Failed to create container: {e.stderr}")
+            raise Exception(f"Docker run failed: {e.stderr}")
         except Exception as e:
             logger.error(f"Failed to create container: {e}")
             raise
     
     def stop_user_container(self, user_id: int) -> bool:
-        """Stop user's code-server container"""
-        if not self.client:
+        """Stop user's code-server container using Docker CLI"""
+        if not self.available:
             return False
         
         try:
-            container = self.client.containers.get(self.get_container_name(user_id))
-            container.stop()
-            logger.info(f"Stopped container for user {user_id}")
-            return True
-        except docker.errors.NotFound:
-            return True  # Already stopped
+            result = subprocess.run(
+                ['docker', 'stop', self.get_container_name(user_id)],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode == 0:
+                logger.info(f"Stopped container for user {user_id}")
+                return True
+            else:
+                logger.warning(f"Container stop returned {result.returncode}: {result.stderr}")
+                return result.returncode == 1  # Container may not exist, that's ok
         except Exception as e:
             logger.error(f"Error stopping container: {e}")
             return False
     
     def remove_user_container(self, user_id: int) -> bool:
-        """Remove user's code-server container"""
-        if not self.client:
+        """Remove user's code-server container using Docker CLI"""
+        if not self.available:
             return False
         
         try:
-            container = self.client.containers.get(self.get_container_name(user_id))
-            container.remove(force=True)
-            logger.info(f"Removed container for user {user_id}")
-            return True
-        except docker.errors.NotFound:
-            return True  # Already removed
+            result = subprocess.run(
+                ['docker', 'rm', '-f', self.get_container_name(user_id)],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode == 0:
+                logger.info(f"Removed container for user {user_id}")
+                return True
+            else:
+                logger.warning(f"Container remove returned {result.returncode}: {result.stderr}")
+                return result.returncode == 1  # Container may not exist, that's ok
         except Exception as e:
             logger.error(f"Error removing container: {e}")
             return False
