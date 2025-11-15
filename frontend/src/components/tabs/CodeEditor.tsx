@@ -16,7 +16,7 @@ function CodeEditor() {
       setStatus('starting')
       
       // Start or access user's code-server instance
-      const response = await axios.post('/api/v1/code-server/start')
+      const response = await axios.post('/v1/code-server/start')
       
       // Construct the URL to the user's code-server
       const baseUrl = window.location.origin
