@@ -88,6 +88,22 @@ services:
       timeout: 10s
       retries: 3
 
+  code-server:
+    image: codercom/code-server:latest
+    container_name: beacon-code-server
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend/workspace:/home/coder/workspace
+      - code-server-config:/home/coder/.config
+      - code-server-local:/home/coder/.local
+    environment:
+      - PASSWORD=${CODE_SERVER_PASSWORD:-changeme}
+      - SUDO_PASSWORD=${CODE_SERVER_PASSWORD:-changeme}
+    command: --bind-addr 0.0.0.0:8080 --auth password /home/coder/workspace
+    restart: unless-stopped
+    user: "1000:1000"
+
   frontend:
     build:
       context: ./frontend
@@ -100,9 +116,12 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - backend
+      - code-server
     restart: unless-stopped
 
 volumes:
   postgres_data:
   workspace:
+  code-server-config:
+  code-server-local:
 
