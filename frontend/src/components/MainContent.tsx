@@ -54,7 +54,7 @@ function MainContent({ selectedFile }: MainContentProps) {
         </Box>
 
         <Box bg="rgba(45, 27, 71, 0.4)" borderRadius="0 0 12px 12px" p={6} h="calc(100% - 50px)" overflow="auto">
-          {activeTab === 0 && <CodeEditor selectedFile={selectedFile} />}
+          {activeTab === 0 && <CodeEditor />}
           {activeTab === 1 && <WebEdit />}
           {activeTab === 2 && <DataExplorer />}
           {activeTab === 3 && <QueryFilter />}
