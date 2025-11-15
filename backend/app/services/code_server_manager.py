@@ -6,7 +6,6 @@ import logging
 from pathlib import Path
 from typing import Optional, Dict
 import os
-import requests_unixsocket
 
 logger = logging.getLogger(__name__)
 
@@ -22,10 +21,9 @@ class CodeServerManager:
     
     def __init__(self):
         try:
-            # Ensure requests can speak unix sockets (needed by docker SDK)
-            requests_unixsocket.monkeypatch()
-            # Connect to Docker socket (note: three slashes after unix:)
-            self.client = docker.DockerClient(base_url='unix:///var/run/docker.sock')
+            # Use from_env() which properly handles DOCKER_HOST and Unix sockets
+            # DOCKER_HOST is set to unix:///var/run/docker.sock in docker-compose.yml
+            self.client = docker.from_env()
             self.base_port = 9000  # Starting port for user instances
             self.workspace_base = Path(os.getenv("WORKSPACE_BASE", "/app/workspace"))
             logger.info("CodeServerManager initialized successfully")
