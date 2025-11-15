@@ -135,7 +135,6 @@ class CodeServerManager:
             '--detach',
             '--network', 'gunpowder-splash_beacon-network',
             '--volume', f'{workspace.absolute()}:/home/coder/workspace:rw',
-            '--user', '1000:1000',
             '--restart', 'unless-stopped',
             # Traefik labels
             '--label', 'traefik.enable=true',
@@ -146,10 +145,10 @@ class CodeServerManager:
             '--label', f'traefik.http.middlewares.code-user-{user_id}-stripprefix.stripprefix.prefixes=/code/user/{user_id}',
             '--label', f'traefik.http.routers.code-user-{user_id}.middlewares=code-user-{user_id}-stripprefix',
             '--label', f'gunpowder.user_id={user_id}',
+            '--entrypoint', '/bin/sh',
             'codercom/code-server:latest',
-            '--bind-addr', '0.0.0.0:8080',
-            '--auth', 'none',
-            '/home/coder/workspace'
+            '-c',
+            'chown -R coder:coder /home/coder/workspace && exec /usr/bin/entrypoint.sh --bind-addr 0.0.0.0:8080 --auth none /home/coder/workspace'
         ]
         
         try:
